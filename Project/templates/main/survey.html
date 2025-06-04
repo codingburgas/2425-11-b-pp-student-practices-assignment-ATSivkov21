@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}User Survey{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h2 class="mb-4" data-aos="fade-down">Tell Us About Yourself</h2>
+    <form method="POST" data-aos="zoom-in">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">{{ form.age.label }}{{ form.age(class="form-control") }}</div>
+      <div class="mb-3">{{ form.daily_online_hours.label }}{{ form.daily_online_hours(class="form-control") }}</div>
+      <div class="mb-3">{{ form.device.label }}{{ form.device(class="form-select") }}</div>
+      <div class="mb-3">{{ form.interests.label }}{{ form.interests(class="form-control", rows=3) }}</div>
+      <div class="mb-3">{{ form.submit(class="btn btn-info w-100") }}</div>
+    </form>
+  </div>
+</div>
+{% endblock %}

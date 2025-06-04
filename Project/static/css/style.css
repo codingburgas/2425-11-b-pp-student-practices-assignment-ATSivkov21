@@ -1,0 +1,31 @@
+body {
+  background: #f9f9f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+  transition: all 0.3s ease-in-out;
+}
+
+h1.display-4 {
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.btn {
+  transition: transform 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.alert {
+  transition: all 0.5s ease;
+}

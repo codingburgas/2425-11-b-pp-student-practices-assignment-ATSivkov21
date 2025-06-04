@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block title %}Your Prediction{% endblock %}
+{% block content %}
+<div class="text-center">
+  <h2 data-aos="fade-right">Prediction Result</h2>
+  <p class="lead" data-aos="fade-up">Your probability to click the ad: <strong>{{ prob * 100 }}%</strong></p>
+  <div data-aos="zoom-in">
+    <img src="{{ url_for('static', filename='ads/' ~ ad) }}" class="img-thumbnail shadow-lg" style="max-height: 300px;">
+  </div>
+  <a href="{{ url_for('main.ad_click', ad_name=ad) }}" class="btn btn-success mt-4" data-aos="fade-up">Click This Ad</a>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+Flask
+Flask-Bootstrap
+Flask-WTF
+Flask-SQLAlchemy
+Flask-Login
+Flask-Migrate
+Flask-Mail
+email-validator
+itsdangerous
+python-dotenv
+joblib
+numpy
+pandas
+matplotlib
+pytest
