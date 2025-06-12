@@ -5,6 +5,7 @@ from app.forms import SurveyForm
 from app import db
 from app.models import SurveyResponse, AdClick
 from app.utils.ai_model import predict_click_probability
+from app.utils.plot_utils import generate_user_plot
 import random
 
 ADS = ['ad1.jpg', 'ad2.jpg', 'ad3.jpg']  # Примерни реклами
@@ -37,7 +38,11 @@ def result(survey_id):
     survey = SurveyResponse.query.get_or_404(survey_id)
     prob = predict_click_probability(survey)
     selected_ad = random.choice(ADS)
-    return render_template('main/result.html', prob=prob, ad=selected_ad)
+
+    # 🖼️ generate and return image path
+    user_result_path = generate_user_plot(current_user.id, survey)
+
+    return render_template('main/result.html', prob=prob, ad=selected_ad, user_result_path=user_result_path)
 
 @main_bp.route('/ad_click/<ad_name>')
 @login_required

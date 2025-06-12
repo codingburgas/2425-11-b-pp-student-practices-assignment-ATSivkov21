@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block title %}Server Error{% endblock %}
 {% block content %}
-<div class="text-center" data-aos="zoom-in">
-  <h1 class="display-3 text-warning">500</h1>
-  <p class="lead">Oops! Something went wrong on our end.</p>
-  <a href="{{ url_for('main.index') }}" class="btn btn-warning">Back to Safety</a>
+<div class="error-wrapper">
+  <h1>500</h1>
+  <p>Something went wrong. We're fixing it!</p>
+  <a href="{{ url_for('main.index') }}" class="btn btn-warning mt-3">Back to Safety</a>
 </div>
 {% endblock %}

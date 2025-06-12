@@ -3,18 +3,18 @@
 {% block title %}Home - Ad Predictor{% endblock %}
 
 {% block content %}
-<div class="text-center">
-  <h1 class="display-4" data-aos="zoom-in">Welcome to Ad Predictor</h1>
-  <p class="lead" data-aos="fade-up" data-aos-delay="200">
-    Find out which ads you are most likely to click based on your behavior.
+<div class="text-center fade-in-up">
+  <h1 class="display-4">Welcome to Ad Predictor</h1>
+  <p class="lead">
+    Discover which ads you're most likely to engage with – powered by AI.
   </p>
-  <img src="{{ url_for('static', filename='ads/ad1.jpg') }}" class="img-fluid rounded shadow-lg mt-4" style="max-height: 400px;" data-aos="flip-left" alt="Sample Ad">
+  <img src="{{ url_for('static', filename='ads/ad1.jpg') }}" class="img-fluid rounded shadow-lg mt-4 result-image" alt="Sample Ad">
   <div class="mt-4">
     {% if current_user.is_authenticated %}
-      <a href="{{ url_for('main.survey') }}" class="btn btn-primary btn-lg" data-aos="fade-right">Take the Survey</a>
+      <a href="{{ url_for('main.survey') }}" class="btn btn-primary btn-lg">Take the Survey</a>
     {% else %}
-      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg me-3" data-aos="fade-left">Join Now</a>
-      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg" data-aos="fade-left" data-aos-delay="100">Log In</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg me-3">Join Now</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">Log In</a>
     {% endif %}
   </div>
 </div>

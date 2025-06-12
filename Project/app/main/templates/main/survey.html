@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 {% block title %}User Survey{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center fade-in-up">
   <div class="col-md-8">
-    <h2 class="mb-4" data-aos="fade-down">Tell Us About Yourself</h2>
-    <form method="POST" data-aos="zoom-in">
+    <h2 class="mb-4">Tell Us About Yourself</h2>
+    <form method="POST">
       {{ form.hidden_tag() }}
       <div class="mb-3">{{ form.age.label }}{{ form.age(class="form-control") }}</div>
       <div class="mb-3">{{ form.daily_online_hours.label }}{{ form.daily_online_hours(class="form-control") }}</div>
