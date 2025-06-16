@@ -42,3 +42,5 @@ class AdClick(db.Model):
     ad_name = db.Column(db.String(64))
     clicked_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+email_confirmed = db.Column(db.Boolean, default=False)
