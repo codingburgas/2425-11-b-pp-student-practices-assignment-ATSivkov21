@@ -34,13 +34,14 @@ class SurveyResponse(db.Model):
     daily_online_hours = db.Column(db.Float)
     device = db.Column(db.String(64))
     interests = db.Column(db.String(256))
+    selected_ads = db.Column(db.String(200), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class AdClick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ad_name = db.Column(db.String(64))
-    clicked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    ad_name = db.Column(db.String(100), nullable=False)
+    clicked_at = db.Column(db.DateTime, server_default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 email_confirmed = db.Column(db.Boolean, default=False)

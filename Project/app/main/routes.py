@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, send_file
 from flask_login import login_required, current_user
 from app.main import main_bp
 from app.forms import SurveyForm
@@ -7,6 +7,7 @@ from app.models import SurveyResponse, AdClick
 from app.utils.ai_model import predict_click_probability
 from app.utils.plot_utils import generate_user_plot
 import random
+import os
 
 ADS = ['ad1.jpg', 'ad2.jpg', 'ad3.jpg']  # Примерни реклами
 
@@ -24,25 +25,38 @@ def survey():
             daily_online_hours=form.daily_online_hours.data,
             device=form.device.data,
             interests=form.interests.data,
+            selected_ads=','.join(form.selected_ads.data),
             user_id=current_user.id
         )
         db.session.add(survey)
         db.session.commit()
-        flash("Survey submitted successfully!", "success")
         return redirect(url_for('main.result', survey_id=survey.id))
     return render_template('main/survey.html', form=form)
 
+#@main_bp.route('/result/<int:survey_id>')
+#@login_required
+#def result(survey_id):
+#    survey = SurveyResponse.query.get_or_404(survey_id)
+#    prob = predict_click_probability(survey)
+#    selected_ad = random.choice(ADS)
+
+    # 🖼️ generate and return image path
+#    user_result_path = generate_user_plot(current_user.id, survey)
+
+#    return render_template('main/result.html', prob=prob, ad=selected_ad, user_result_path=user_result_path)
 @main_bp.route('/result/<int:survey_id>')
 @login_required
 def result(survey_id):
     survey = SurveyResponse.query.get_or_404(survey_id)
     prob = predict_click_probability(survey)
-    selected_ad = random.choice(ADS)
+    image_name = generate_user_plot(current_user.id, survey)
+    return render_template('main/result.html', prob=prob, ad='ad1.jpg', user_result_path=image_name)
 
-    # 🖼️ generate and return image path
-    user_result_path = generate_user_plot(current_user.id, survey)
-
-    return render_template('main/result.html', prob=prob, ad=selected_ad, user_result_path=user_result_path)
+@main_bp.route('/download_regression/<int:user_id>')
+@login_required
+def download_regression(user_id):
+    file_path = os.path.join('app', 'static', 'results', f'user_{user_id}.png')
+    return send_file(file_path, as_attachment=True)
 
 @main_bp.route('/ad_click/<ad_name>')
 @login_required

@@ -1,23 +1,33 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField, SelectField, TextAreaField, SelectMultipleField
+from wtforms.validators import DataRequired, Email, EqualTo, NumberRange
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=64)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
+    confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])
+    submit = SubmitField('Register')
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class SurveyForm(FlaskForm):
-    age = IntegerField('Age', validators=[DataRequired(), NumberRange(min=10, max=100)])
-    daily_online_hours = FloatField('Daily Online Hours', validators=[DataRequired(), NumberRange(min=0, max=24)])
-    device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')], validators=[DataRequired()])
-    interests = TextAreaField('Your Interests', validators=[DataRequired(), Length(max=256)])
+    age = IntegerField('Your Age', validators=[DataRequired(), NumberRange(min=10, max=100)])
+    daily_online_hours = FloatField('Hours Online per Day', validators=[DataRequired()])
+    device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')])
+    interests = TextAreaField('Your Interests (comma separated)', validators=[DataRequired()])
+    selected_ads = SelectMultipleField('Which Ads Do You Like?', choices=[
+        ('ad1.jpg', 'Ad 1'), ('ad2.jpg', 'Ad 2'), ('ad3.jpg', 'Ad 3')
+    ])
     submit = SubmitField('Submit Survey')
+
+class EditUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[Email()])
+    email_confirmed = BooleanField('Email Confirmed')
+    submit = SubmitField('Save Changes')
+

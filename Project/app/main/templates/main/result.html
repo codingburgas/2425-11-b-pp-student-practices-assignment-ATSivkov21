@@ -1,18 +1,16 @@
 {% extends 'layout.html' %}
-{% block title %}Your Prediction{% endblock %}
+{% block title %}Prediction Result{% endblock %}
 {% block content %}
 <div class="text-center fade-in-up">
   <h2>Prediction Result</h2>
-  <p class="lead">Your probability to click the ad: <strong>{{ prob * 100 }}%</strong></p>
+  <p class="lead">Click Probability: <strong>{{ prob * 100 }}%</strong></p>
   <div>
-    <img src="{{ url_for('static', filename='ads/' ~ ad) }}" class="result-image">
+    <img src="{{ url_for('static', filename='ads/' ~ ad) }}" class="result-image" alt="Predicted Ad">
   </div>
-  <a href="{{ url_for('main.ad_click', ad_name=ad) }}" class="btn btn-success mt-4">Click This Ad</a>
-  {% if user_result_path %}
-    <div class="mt-4">
-      <h5 class="text-light">Prediction Visualization</h5>
-      <img src="{{ url_for('static', filename='results/' ~ user_result_path) }}" class="img-fluid mt-2 rounded border border-info">
-    </div>
-  {% endif %}
+  <div class="mt-4">
+    <h5 class="text-light">Your Logistic Regression</h5>
+    <img src="{{ url_for('static', filename='results/' ~ user_result_path) }}" class="img-fluid mt-2 rounded border border-info">
+  </div>
+  <a href="{{ url_for('main.download_regression', user_id=current_user.id) }}" class="btn btn-outline-success mt-3">Download My Graph</a>
 </div>
 {% endblock %}

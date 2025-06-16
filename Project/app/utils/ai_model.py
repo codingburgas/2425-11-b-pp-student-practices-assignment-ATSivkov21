@@ -4,6 +4,8 @@ import os
 
 MODEL_PATH = 'instance/model.pkl'
 
+import numpy as np
+
 class SimpleLogisticRegression:
     def __init__(self):
         self.weights = None
@@ -14,7 +16,6 @@ class SimpleLogisticRegression:
 
     def predict_proba(self, X):
         if self.weights is None or self.bias is None:
-            # Automatically fit dummy data if not trained
             X_dummy = np.random.rand(10, X.shape[1])
             y_dummy = (X_dummy[:, 0] + X_dummy[:, 1] > 1).astype(int)
             self.fit(X_dummy, y_dummy)
@@ -43,14 +44,20 @@ class SimpleLogisticRegression:
             self.weights, self.bias = joblib.load(MODEL_PATH)
 
 model = SimpleLogisticRegression()
-model.load()
 
 def predict_click_probability(survey):
-    # Dummy feature engineering
-    age = survey.age / 100
-    hours = survey.daily_online_hours / 24
-    device = 0 if survey.device == 'PC' else (1 if survey.device == 'Mobile' else 2)
-    interests = len(survey.interests) / 256
-    
-    X = np.array([[age, hours, device / 2, interests]])
+    interests_len = len(survey.interests or "") / 256
+    ad_count = len((survey.selected_ads or "").split(',')) / 3  # нормализирано
+
+    device_score = 0 if survey.device == 'PC' else (1 if survey.device == 'Mobile' else 2) / 2
+
+    X = np.array([
+        survey.age / 100,
+        survey.daily_online_hours / 24,
+        device_score,
+        interests_len,
+        ad_count
+    ]).reshape(1, -1)
+
     return round(float(model.predict_proba(X)[0]), 2)
+

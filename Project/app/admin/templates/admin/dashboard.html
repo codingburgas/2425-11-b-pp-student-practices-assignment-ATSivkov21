@@ -3,23 +3,36 @@
 {% block content %}
 <div class="dashboard fade-in-up">
   <h2>Admin Dashboard</h2>
+  <a href="{{ url_for('admin.export_users') }}" class="btn btn-info mb-4">Download All Users (CSV)</a>
   <div class="row">
-    <div class="col-md-6">
-      <h4>Users</h4>
-      <ul class="list-group">
-        {% for user in users %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ user.username }}
-            <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="btn btn-sm btn-danger">Delete</a>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-    <div class="col-md-6">
-      <h4>Survey Submissions</h4>
-      <p>Total: {{ surveys | length }}</p>
-      <h4>Ad Clicks</h4>
-      <p>Total: {{ clicks | length }}</p>
+    <div class="col-md-12">
+      <table class="table table-dark table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Email Confirmed</th>
+            <th>Regression</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ 'Yes' if user.email_confirmed else 'No' }}</td>
+              <td>
+                <a href="{{ url_for('admin.download_user_plot', user_id=user.id) }}" class="btn btn-sm btn-secondary">Download Graph</a>
+              </td>
+              <td>
+                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-sm btn-warning me-1">Edit</a>
+                <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
