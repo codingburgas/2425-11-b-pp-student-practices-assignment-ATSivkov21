@@ -18,10 +18,26 @@ def confirm_token(token, expiration=3600):
 def send_confirmation_email(user):
     token = generate_confirmation_token(user.email)
     confirm_url = url_for('auth.confirm_email', token=token, _external=True)
-    html = f'''
-        <p>Hello, {user.username}!</p>
-        <p>Please confirm your email by clicking the link below:</p>
-        <a href="{confirm_url}">{confirm_url}</a>
-    '''
-    msg = Message('Confirm Your Email', recipients=[user.email], html=html, sender=current_app.config['MAIL_USERNAME'])
+    if user.email.lower().endswith('@gmail.com'):
+        sender = 'alexsanderdaskalo@gmail.com'  # Set this to your Gmail sender
+        html = f'''
+            <p>Hello, {user.username}!</p>
+            <p>Please confirm your Gmail account by clicking the link below:</p>
+            <a href="{confirm_url}">{confirm_url}</a>
+        '''
+    elif user.email.lower().endswith('@outlook.com') or user.email.lower().endswith('@hotmail.com') or user.email.lower().endswith('@codingburgas.bg'):
+        sender = 'ATSivkov21@codingburgas.bg'  # Set this to your Outlook sender
+        html = f'''
+            <p>Hello, {user.username}!</p>
+            <p>Please confirm your Outlook account by clicking the link below:</p>
+            <a href="{confirm_url}">{confirm_url}</a>
+        '''
+    else:
+        sender = current_app.config['MAIL_USERNAME']
+        html = f'''
+            <p>Hello, {user.username}!</p>
+            <p>Please confirm your email by clicking the link below:</p>
+            <a href="{confirm_url}">{confirm_url}</a>
+        '''
+    msg = Message('Confirm Your Email', recipients=[user.email], html=html, sender=sender)
     mail.send(msg)

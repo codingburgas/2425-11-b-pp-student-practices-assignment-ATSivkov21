@@ -5,7 +5,10 @@
   <h2>Prediction Result</h2>
   <p class="lead">Click Probability: <strong>{{ prob * 100 }}%</strong></p>
   <div>
-    <img src="{{ url_for('static', filename='ads/' ~ ad) }}" class="result-image" alt="Predicted Ad">
+    <a href="{{ url_for('main.ad_click', ad_name=ad) }}">
+      <img src="{{ url_for('static', filename='ads/' ~ ad) }}" class="result-image" alt="Predicted Ad" style="cursor:pointer;">
+    </a>
+    <p class="mt-2">Click the ad above to simulate an ad click!</p>
   </div>
   <div class="mt-4">
     <h5 class="text-light">Your Logistic Regression</h5>

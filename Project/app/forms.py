@@ -31,3 +31,8 @@ class EditUserForm(FlaskForm):
     email_confirmed = BooleanField('Email Confirmed')
     submit = SubmitField('Save Changes')
 
+class ProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[Email()])
+    submit = SubmitField('Update Profile')
+

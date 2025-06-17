@@ -1,6 +1,7 @@
 from app.utils.email_utils import send_confirmation_email, confirm_token
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
+from sqlalchemy.exc import IntegrityError
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
@@ -23,7 +24,12 @@ def register():
         user.set_password(form.password.data)
         user.role = Role.query.filter_by(name='user').first()
         db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("Username or email already exists. Please choose another.", "danger")
+            return render_template('auth/register.html', form=form)
 
         send_confirmation_email(user)
         flash("Account created! Check your email to confirm.", "info")
@@ -57,6 +63,10 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
+            if user.role and user.role.name == 'admin':
+                login_user(user, remember=form.remember.data)
+                flash('Welcome, admin!', 'success')
+                return redirect(url_for('admin.dashboard'))
             if not user.email_confirmed:
                 flash('Please confirm your email before logging in.', 'warning')
                 return redirect(url_for('auth.login'))
@@ -77,33 +87,15 @@ def logout():
 
 @auth_bp.route('/confirm/<token>')
 def confirm_email(token):
-    try:
-        email = URLSafeTimedSerializer(current_app.config['SECRET_KEY']).loads(token, salt='email-confirm', max_age=3600)
-    except:
-        flash('Invalid or expired confirmation link.', 'danger')
+    email = confirm_token(token)
+    if not email:
+        flash('The confirmation link is invalid or expired.', 'danger')
         return redirect(url_for('auth.login'))
-
     user = User.query.filter_by(email=email).first_or_404()
     if user.email_confirmed:
-        flash('Account already confirmed.', 'info')
+        flash('Account already confirmed. Please log in.', 'info')
     else:
         user.email_confirmed = True
         db.session.commit()
-        flash('Email confirmed. You can now log in.', 'success')
+        flash('Email confirmed successfully!', 'success')
     return redirect(url_for('auth.login'))
-
-
-def generate_confirmation_token(email):
-    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-    return serializer.dumps(email, salt='email-confirm')
-
-def send_confirmation_email(user):
-    token = generate_confirmation_token(user.email)
-    link = url_for('auth.confirm_email', token=token, _external=True)
-    msg = Message(
-        subject='Confirm Your Email',
-        recipients=[user.email],
-        html=f'<p>Hello, {user.username}! Please confirm your email: <a href="{link}">{link}</a></p>',
-        sender=current_app.config['MAIL_USERNAME']
-    )
-    mail.send(msg)

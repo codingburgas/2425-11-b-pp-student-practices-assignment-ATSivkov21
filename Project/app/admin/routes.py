@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, send_file, make_response
+from flask import render_template, redirect, url_for, flash, request, send_file, make_response, current_app
 from flask_login import login_required, current_user
 from app.admin import admin_bp
 from app.models import User, SurveyResponse
@@ -6,6 +6,7 @@ from app.forms import EditUserForm
 from app import db
 import csv
 import os
+import io
 
 #@admin_bp.route('/dashboard')
 #@login_required
@@ -95,20 +96,25 @@ def delete_user(user_id):
 @admin_required
 def export_users():
     users = User.query.all()
-    response = make_response()
-    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
-    response.headers["Content-Type"] = "text/csv"
-    writer = csv.writer(response)
+    output = io.StringIO()
+    writer = csv.writer(output)
     writer.writerow(['Username', 'Email', 'Confirmed'])
     for u in users:
         writer.writerow([u.username, u.email, u.email_confirmed])
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
+    response.headers["Content-Type"] = "text/csv"
     return response
 
 @admin_bp.route('/download_regression/<int:user_id>')
 @login_required
 @admin_required
 def download_user_plot(user_id):
-    filepath = os.path.join('app', 'static', 'results', f'user_{user_id}.png')
+    filepath = os.path.join(current_app.root_path, 'static', 'results', f'user_{user_id}.png')
+    if not os.path.exists(filepath):
+        flash('Result image not found. Please generate the result first.', 'danger')
+        return redirect(url_for('admin.dashboard'))
     return send_file(filepath, as_attachment=True)
 
 @admin_bp.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])

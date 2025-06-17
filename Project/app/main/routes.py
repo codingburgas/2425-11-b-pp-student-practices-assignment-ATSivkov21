@@ -1,7 +1,7 @@
-from flask import render_template, redirect, url_for, flash, request, send_file
+from flask import render_template, redirect, url_for, flash, request, send_file, current_app
 from flask_login import login_required, current_user
 from app.main import main_bp
-from app.forms import SurveyForm
+from app.forms import SurveyForm, RegistrationForm, ProfileForm
 from app import db
 from app.models import SurveyResponse, AdClick
 from app.utils.ai_model import predict_click_probability
@@ -55,7 +55,11 @@ def result(survey_id):
 @main_bp.route('/download_regression/<int:user_id>')
 @login_required
 def download_regression(user_id):
-    file_path = os.path.join('app', 'static', 'results', f'user_{user_id}.png')
+    # Use the correct path relative to the app root
+    file_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{user_id}.png')
+    if not os.path.exists(file_path):
+        flash("Result image not found. Please generate your result first.", "danger")
+        return redirect(url_for('main.profile'))
     return send_file(file_path, as_attachment=True)
 
 @main_bp.route('/ad_click/<ad_name>')
@@ -66,3 +70,17 @@ def ad_click(ad_name):
     db.session.commit()
     flash("Ad click recorded!", "info")
     return redirect(url_for('main.index'))
+
+@main_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = ProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Profile updated!', 'success')
+        return redirect(url_for('main.profile'))
+    surveys = SurveyResponse.query.filter_by(user_id=current_user.id).all()
+    ad_clicks = AdClick.query.filter_by(user_id=current_user.id).all()
+    return render_template('main/profile.html', form=form, surveys=surveys, ad_clicks=ad_clicks)
