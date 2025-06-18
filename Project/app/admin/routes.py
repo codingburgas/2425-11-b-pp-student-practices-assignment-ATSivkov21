@@ -149,3 +149,28 @@ def upload_ad():
         flash('Ad image uploaded successfully!', 'success')
         return redirect(url_for('admin.dashboard'))
     return render_template('admin/upload_ad.html', form=form)
+
+# 📊 Мониторинг на AI модела
+@admin_bp.route('/model_monitoring')
+@login_required
+@admin_required
+def model_monitoring():
+    import json
+    import os
+    
+    # Зареждане на метриките на модела
+    metrics_file = os.path.join(current_app.root_path, '..', 'instance', 'model_metrics.json')
+    metrics = {}
+    
+    if os.path.exists(metrics_file):
+        with open(metrics_file, 'r') as f:
+            metrics = json.load(f)
+    
+    # Зареждане на историята на обучението
+    from app.utils.ai_model import model
+    model.load()
+    training_history = model.training_history
+    
+    return render_template('admin/model_monitoring.html', 
+                         metrics=metrics, 
+                         training_history=training_history)

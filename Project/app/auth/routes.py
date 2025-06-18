@@ -1,6 +1,6 @@
 # 📦 Импортиране на помощни функции за изпращане и потвърждаване на имейл
-from app.utils.email_utils import send_confirmation_email, confirm_token
-# 🌐 Основни функции за уеб интерфейс
+from app.utils.email_utils import send_confirmation_email, confirm_token, is_email_configured
+# �� Основни функции за уеб интерфейс
 from flask import render_template, redirect, url_for, flash, request
 # 🔐 Управление на потребители (логване, текущ потребител и достъп)
 from flask_login import login_user, logout_user, current_user, login_required
@@ -38,6 +38,7 @@ def register():
         user = User(
             username=form.username.data,
             email=form.email.data,
+            share_results=form.share_results.data
         )
         # Задаване на хеширана парола
         user.set_password(form.password.data)
@@ -56,9 +57,21 @@ def register():
             flash("Username or email already exists. Please choose another.", "danger")
             return render_template('auth/register.html', form=form)
 
-        # Изпращане на имейл за потвърждение
-        send_confirmation_email(user)
-        flash("Account created! Check your email to confirm.", "info")
+        # Проверка дали имейл конфигурацията е валидна
+        if is_email_configured():
+            # Опит за изпращане на имейл за потвърждение
+            email_sent = send_confirmation_email(user)
+            if email_sent:
+                flash("Account created! Check your email to confirm.", "info")
+            else:
+                flash("Account created! Email confirmation failed. Please contact administrator.", "warning")
+        else:
+            # Ако имейл конфигурацията не е настроена, автоматично потвърждаваме акаунта
+            user.email_confirmed = True
+            db.session.commit()
+            flash("Account created successfully! Email confirmation is disabled.", "success")
+            return redirect(url_for('auth.login'))
+
         return redirect(url_for('auth.login'))
 
     # Ако GET заявка или невалидна форма, показваме формата отново
@@ -122,7 +135,11 @@ def login():
             flash('Welcome!', 'success')
             return redirect(url_for('main.survey'))
         else:
-            flash('Login failed. Check your credentials.', 'danger')
+            if not user:
+                flash('Email does not exist. Please register first.', 'danger')
+                return redirect(url_for('auth.register'))
+            else:
+                flash('Login failed. Check your credentials.', 'danger')
 
     # Показваме отново формата
     return render_template('auth/login.html', form=form)

@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 # 📂 За проверка на съществуване на файл
 import os
+# 📊 За изчисляване на метрики
+from sklearn.metrics import accuracy_score, mean_squared_error, log_loss
 # 📌 Път до файла, в който се пази моделът
 MODEL_PATH = 'instance/model.pkl'
 
@@ -12,6 +14,7 @@ class SimpleLogisticRegression:
         # Инициализация на теглата и bias-а (те ще се обучат при нужда)
         self.weights = None
         self.bias = None
+        self.training_history = {'loss': [], 'accuracy': []}
 
     def sigmoid(self, z):
         # Сигмоида — активационна функция за логистична регресия
@@ -36,8 +39,11 @@ class SimpleLogisticRegression:
         n_samples, n_features = X.shape
         self.weights = np.zeros(n_features)
         self.bias = 0
+        
+        # Изчистване на историята на обучението
+        self.training_history = {'loss': [], 'accuracy': []}
 
-        for _ in range(epochs):
+        for epoch in range(epochs):
             linear_model = np.dot(X, self.weights) + self.bias
             y_predicted = self.sigmoid(linear_model)
 
@@ -48,15 +54,43 @@ class SimpleLogisticRegression:
             # Обновяване на параметрите
             self.weights -= lr * dw
             self.bias -= lr * db
+            
+            # Изчисляване на метрики за мониторинг
+            if epoch % 10 == 0:  # Записваме на всеки 10 епохи
+                loss = log_loss(y, y_predicted)
+                accuracy = accuracy_score(y, self.predict(X))
+                self.training_history['loss'].append(loss)
+                self.training_history['accuracy'].append(accuracy)
+
+    def evaluate(self, X_test, y_test):
+        """Оценяване на модела с различни метрики"""
+        y_pred = self.predict(X_test)
+        y_pred_proba = self.predict_proba(X_test)
+        
+        metrics = {
+            'accuracy': accuracy_score(y_test, y_pred),
+            'mse': mean_squared_error(y_test, y_pred_proba),
+            'log_loss': log_loss(y_test, y_pred_proba),
+            'training_loss': self.training_history['loss'][-1] if self.training_history['loss'] else None,
+            'training_accuracy': self.training_history['accuracy'][-1] if self.training_history['accuracy'] else None
+        }
+        
+        return metrics
 
     def save(self):
         # Записване на теглата и bias-а във файл
-        joblib.dump((self.weights, self.bias), MODEL_PATH)
+        joblib.dump((self.weights, self.bias, self.training_history), MODEL_PATH)
 
     def load(self):
         # Зареждане на модела, ако файлът съществува
         if os.path.exists(MODEL_PATH):
-            self.weights, self.bias = joblib.load(MODEL_PATH)
+            loaded_data = joblib.load(MODEL_PATH)
+            if len(loaded_data) == 3:
+                self.weights, self.bias, self.training_history = loaded_data
+            else:
+                # Backward compatibility
+                self.weights, self.bias = loaded_data
+                self.training_history = {'loss': [], 'accuracy': []}
 
 
 model = SimpleLogisticRegression()

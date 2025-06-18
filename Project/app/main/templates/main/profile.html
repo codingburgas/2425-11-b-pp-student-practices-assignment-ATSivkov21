@@ -8,8 +8,20 @@
       {{ form.hidden_tag() }}
       <div class="mb-3">{{ form.username.label }}{{ form.username(class="form-control") }}</div>
       <div class="mb-3">{{ form.email.label }}{{ form.email(class="form-control") }}</div>
+      <div class="mb-3">
+        <div class="form-check">
+          {{ form.share_results(class="form-check-input") }}
+          {{ form.share_results.label(class="form-check-label") }}
+        </div>
+        <small class="form-text text-muted">Allow other users to see your survey results and predictions</small>
+      </div>
       <div class="mb-3">{{ form.submit(class="btn btn-primary w-100", value="Update Profile") }}</div>
     </form>
+    
+    <div class="text-center mb-4">
+      <a href="{{ url_for('main.shared_results') }}" class="btn btn-outline-info">View Shared Results</a>
+    </div>
+    
     <hr>
     <h4>My Survey Responses</h4>
     {% if surveys %}

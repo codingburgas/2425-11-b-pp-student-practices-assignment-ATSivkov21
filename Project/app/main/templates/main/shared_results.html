@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block title %}Shared Results{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Shared Survey Results</h2>
+    <p class="text-muted text-center">Results from users who have agreed to share their data</p>
+    
+    {% if user_results %}
+        {% for username, surveys in user_results.items() %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">{{ username }}</h5>
+            </div>
+            <div class="card-body">
+                {% for survey in surveys %}
+                <div class="row mb-3 border-bottom pb-3">
+                    <div class="col-md-3">
+                        <strong>Age:</strong> {{ survey.age }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Device:</strong> {{ survey.device }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Click Probability:</strong> 
+                        <span class="badge {% if survey.click_probability > 0.7 %}bg-success{% elif survey.click_probability > 0.4 %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ "%.1f"|format(survey.click_probability * 100) }}%
+                        </span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Date:</strong> {{ survey.timestamp.strftime('%Y-%m-%d') }}
+                    </div>
+                    <div class="col-12 mt-2">
+                        <strong>Interests:</strong> {{ survey.interests }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center">
+            <p class="lead">No shared results available yet.</p>
+            <p>Users need to agree to share their results in their profile settings.</p>
+        </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Back to Profile</a>
+    </div>
+</div>
+{% endblock %} 

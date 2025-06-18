@@ -9,7 +9,7 @@ from app.forms import SurveyForm, RegistrationForm, ProfileForm
 # 🗃️ SQLAlchemy базата данни
 from app import db
 # 👥 Модели: отговори от анкета и кликнати реклами
-from app.models import SurveyResponse, AdClick
+from app.models import SurveyResponse, AdClick, User
 # 🤖 Модел за прогнозиране на вероятност за кликване
 from app.utils.ai_model import predict_click_probability
 # 📊 Функция за генериране и запис на графики (логистична регресия)
@@ -125,6 +125,7 @@ def profile():
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.email = form.email.data
+        current_user.share_results = form.share_results.data
         db.session.commit()
         flash('Profile updated!', 'success')
         return redirect(url_for('main.profile'))
@@ -134,3 +135,27 @@ def profile():
     ad_clicks = AdClick.query.filter_by(user_id=current_user.id).all()
 
     return render_template('main/profile.html', form=form, surveys=surveys, ad_clicks=ad_clicks)
+
+@main_bp.route('/shared_results')
+@login_required
+def shared_results():
+    # Взимане на резултати от потребители, които са дали съгласие за споделяне
+    shared_surveys = SurveyResponse.query.join(User).filter(
+        User.share_results == True,
+        SurveyResponse.user_id != current_user.id
+    ).all()
+    
+    # Групиране по потребител
+    user_results = {}
+    for survey in shared_surveys:
+        if survey.user.username not in user_results:
+            user_results[survey.user.username] = []
+        user_results[survey.user.username].append({
+            'age': survey.age,
+            'device': survey.device,
+            'interests': survey.interests,
+            'click_probability': predict_click_probability(survey),
+            'timestamp': survey.timestamp
+        })
+    
+    return render_template('main/shared_results.html', user_results=user_results)

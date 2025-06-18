@@ -9,6 +9,7 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[Email()])  # Поле за имейл с валидатор за правилен формат
     password = PasswordField('Password', validators=[DataRequired()])  # Поле за парола, задължително
     confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])  # Поле за потвърждение на паролата (трябва да съвпада с password)
+    share_results = BooleanField('I agree to share my survey results with other users')  # Чекбокс за съгласие за споделяне на резултати
     submit = SubmitField('Register')  # Бутон за изпращане на формата
 
 # Форма за вход в системата
@@ -38,6 +39,7 @@ class EditUserForm(FlaskForm):
 class ProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])  # Поле за потребителско име
     email = StringField('Email', validators=[Email()])  # Поле за имейл
+    share_results = BooleanField('I agree to share my survey results with other users')  # Чекбокс за съгласие за споделяне на резултати
     submit = SubmitField('Update Profile')  # Бутон за обновяване
 
 # Форма за качване на рекламно изображение

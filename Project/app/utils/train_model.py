@@ -52,13 +52,34 @@ def main():
             print("No survey data found. Please collect data first.")
             return
 
-        # Обучение на модела с реалните потребителски данни
-        model.fit(X, y)
+        # Разделяне на данните за обучение и тестване (80/20)
+        split_idx = int(0.8 * len(X))
+        X_train, X_test = X[:split_idx], X[split_idx:]
+        y_train, y_test = y[:split_idx], y[split_idx:]
 
+        # Обучение на модела с реалните потребителски данни
+        model.fit(X_train, y_train, epochs=200)
+
+        # Оценяване на модела
+        metrics = model.evaluate(X_test, y_test)
+        
         # Запазване на модела във файл (model.pkl)
         model.save()
-
+        
         print(f"Model trained and saved to {MODEL_PATH}")
+        print("\nModel Performance Metrics:")
+        print(f"Accuracy: {metrics['accuracy']:.4f}")
+        print(f"Mean Squared Error: {metrics['mse']:.4f}")
+        print(f"Log Loss: {metrics['log_loss']:.4f}")
+        print(f"Final Training Loss: {metrics['training_loss']:.4f}")
+        print(f"Final Training Accuracy: {metrics['training_accuracy']:.4f}")
+        
+        # Запазване на метриките в отделен файл
+        import json
+        metrics_file = 'instance/model_metrics.json'
+        with open(metrics_file, 'w') as f:
+            json.dump(metrics, f, indent=2)
+        print(f"Metrics saved to {metrics_file}")
 
 
 if __name__ == "__main__":

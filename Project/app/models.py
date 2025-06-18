@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)  # Имейл, задължителен и уникален
     password_hash = db.Column(db.String(128))  # Хеширана парола
     email_confirmed = db.Column(db.Boolean, default=False)  # Дали имейлът е потвърден (по подразбиране False)
+    share_results = db.Column(db.Boolean, default=False)  # Дали потребителят дава съгласие за споделяне на резултати
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))  # Външен ключ към ролята на потребителя
     survey_responses = db.relationship('SurveyResponse', backref='user', lazy=True)  # Всички отговори на анкети, свързани с този потребител
     ad_clicks = db.relationship('AdClick', backref='user', lazy=True)  # Всички кликвания на реклами от този потребител

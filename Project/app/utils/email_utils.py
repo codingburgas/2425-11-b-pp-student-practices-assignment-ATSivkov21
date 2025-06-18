@@ -3,9 +3,12 @@ from flask_mail import Message
 # 🔐 Импорт на библиотека за създаване и валидиране на токени с изтичане (напр. за имейл потвърждение)
 from itsdangerous import URLSafeTimedSerializer
 # 🔧 Импорти от Flask за конфигурация и създаване на пълен URL
-from flask import current_app, url_for
+from flask import current_app, url_for, flash
 # 📬 Импортиране на mail обекта, дефиниран във Flask приложението
 from app import mail
+# ⚠️ За обработка на грешки при изпращане на имейли
+import smtplib
+from smtplib import SMTPAuthenticationError, SMTPSenderRefused
 
 # 🔐 Създаване на токен за потвърждаване на имейл
 def generate_confirmation_token(email):
@@ -33,32 +36,46 @@ def send_confirmation_email(user):
     # Създаваме пълен URL към рутата за потвърждение с токена
     confirm_url = url_for('auth.confirm_email', token=token, _external=True)
 
-    # 🎯 Избор на подател и HTML съдържание според имейл домейна
-    if user.email.lower().endswith('@gmail.com'):
-        sender = 'alexsanderdaskalo@gmail.com'  # Gmail подател
-        html = f'''
-            <p>Hello, {user.username}!</p>
-            <p>Please confirm your Gmail account by clicking the link below:</p>
-            <a href="{confirm_url}">{confirm_url}</a>
-        '''
-    elif user.email.lower().endswith('@outlook.com') or user.email.lower().endswith('@hotmail.com') or user.email.lower().endswith('@codingburgas.bg'):
-        sender = 'ATSivkov21@codingburgas.bg'  # Outlook подател
-        html = f'''
-            <p>Hello, {user.username}!</p>
-            <p>Please confirm your Outlook account by clicking the link below:</p>
-            <a href="{confirm_url}">{confirm_url}</a>
-        '''
-    else:
-        # 📬 Стандартен подател от конфигурацията на приложението
-        sender = current_app.config['MAIL_USERNAME']
-        html = f'''
-            <p>Hello, {user.username}!</p>
-            <p>Please confirm your email by clicking the link below:</p>
-            <a href="{confirm_url}">{confirm_url}</a>
-        '''
+    # 📧 Създаване на имейл съобщението с универсален подател
+    html = f'''
+        <p>Hello, {user.username}!</p>
+        <p>Please confirm your email by clicking the link below:</p>
+        <a href="{confirm_url}">{confirm_url}</a>
+        <p>If the link doesn't work, copy and paste it into your browser.</p>
+        <p>This link will expire in 1 hour.</p>
+    '''
 
-    # 📧 Създаване на имейл съобщението
+    # Използваме конфигурирания подател от настройките
+    sender = current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')
+    
     msg = Message('Confirm Your Email', recipients=[user.email], html=html, sender=sender)
 
-    # 🚀 Изпращане на имейла чрез mail обекта
-    mail.send(msg)
+    try:
+        # 🚀 Изпращане на имейла чрез mail обекта
+        mail.send(msg)
+        return True
+    except (SMTPAuthenticationError, SMTPSenderRefused) as e:
+        # Ако има проблем с автентикацията, връщаме False
+        print(f"Email authentication failed: {e}")
+        return False
+    except Exception as e:
+        # За други грешки при изпращане
+        print(f"Email sending failed: {e}")
+        return False
+
+# 📧 Функция за проверка дали имейл конфигурацията е валидна
+def is_email_configured():
+    """Проверява дали имейл конфигурацията е правилно настроена"""
+    try:
+        # Проверяваме дали имейл потвърждението е активирано
+        if not current_app.config.get('EMAIL_CONFIRMATION_ENABLED', False):
+            return False
+            
+        # Проверяваме дали имаме необходимите настройки
+        required_settings = ['MAIL_SERVER', 'MAIL_PORT', 'MAIL_USERNAME', 'MAIL_PASSWORD']
+        for setting in required_settings:
+            if not current_app.config.get(setting):
+                return False
+        return True
+    except Exception:
+        return False
