@@ -1,12 +1,23 @@
 from flask import render_template, redirect, url_for, flash, request, send_file, make_response, current_app
 from flask_login import login_required, current_user
 from app.admin import admin_bp
-from app.models import User, SurveyResponse
-from app.forms import EditUserForm
+from app.models import User, SurveyResponse, AdClick
+from app.forms import EditUserForm, AdUploadForm
 from app import db
 import csv
 import os
 import io
+from werkzeug.utils import secure_filename
+from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role.name != 'admin':
+            flash('Admin access required.', 'danger')
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated
 
 #@admin_bp.route('/dashboard')
 #@login_required
@@ -34,20 +45,15 @@ import io
 
 @admin_bp.route('/user/download_all')
 @login_required
+@admin_required
 def download_all_users():
-    if not current_user.role.name == 'admin':
-        flash('Unauthorized', 'danger')
-        return redirect(url_for('main.index'))
-
-    filepath = 'app/static/results/users.csv'
+    filepath = os.path.join(current_app.root_path, 'static', 'results', 'users.csv')
     users = User.query.all()
-
-    with open(filepath, 'w', newline='') as csvfile:
+    with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['ID', 'Username', 'Email', 'Confirmed'])
         for user in users:
             writer.writerow([user.id, user.username, user.email, user.email_confirmed])
-
     return send_file(filepath, as_attachment=True)
 
 @admin_bp.route('/user/download_image/<int:user_id>')
@@ -63,23 +69,24 @@ def download_image(user_id):
     flash('Image not found.', 'warning')
     return redirect(url_for('admin.dashboard'))
 
-
-def admin_required(f):
-    from functools import wraps
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role.name != 'admin':
-            flash('Admin access required.', 'danger')
-            return redirect(url_for('main.index'))
-        return f(*args, **kwargs)
-    return decorated
+@admin_bp.route('/view_user_plot/<int:user_id>')
+@login_required
+@admin_required
+def view_user_plot(user_id):
+    plot_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{user_id}.png')
+    if not os.path.exists(plot_path):
+        flash('Result image not found. Please generate the result first.', 'danger')
+        return redirect(url_for('admin.dashboard'))
+    return send_file(plot_path, mimetype='image/png')
 
 @admin_bp.route('/dashboard')
 @login_required
 @admin_required
 def dashboard():
     users = User.query.all()
-    return render_template('admin/dashboard.html', users=users)
+    surveys = SurveyResponse.query.all()
+    clicks = AdClick.query.all()
+    return render_template('admin/dashboard.html', users=users, surveys=surveys, clicks=clicks)
 
 @admin_bp.route('/delete_user/<int:user_id>')
 @login_required
@@ -133,3 +140,17 @@ def edit_user(user_id):
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin/edit_user.html', form=form, user=user)
+
+@admin_bp.route('/upload_ad', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def upload_ad():
+    form = AdUploadForm()
+    if form.validate_on_submit():
+        file = form.ad_image.data
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(current_app.root_path, 'static', 'ads', filename)
+        file.save(file_path)
+        flash('Ad image uploaded successfully!', 'success')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/upload_ad.html', form=form)

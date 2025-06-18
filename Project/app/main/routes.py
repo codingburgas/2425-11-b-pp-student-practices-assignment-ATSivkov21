@@ -19,18 +19,32 @@ def index():
 @login_required
 def survey():
     form = SurveyForm()
+    
+    # Get list of ad images from the ads directory
+    ads_dir = os.path.join(current_app.root_path, 'static', 'ads')
+    ad_images = [f for f in os.listdir(ads_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    
+    # Update form choices with available ad images
+    form.selected_ad.choices = [(img, f'Ad {i+1}') for i, img in enumerate(ad_images)]
+    
     if form.validate_on_submit():
         survey = SurveyResponse(
             age=form.age.data,
             daily_online_hours=form.daily_online_hours.data,
             device=form.device.data,
             interests=form.interests.data,
-            selected_ads=','.join(form.selected_ads.data),
+            selected_ads=form.selected_ad.data,
             user_id=current_user.id
         )
         db.session.add(survey)
         db.session.commit()
+        
+        # Generate and save the plot
+        plot_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{current_user.id}.png')
+        generate_user_plot(survey, plot_path)
+        
         return redirect(url_for('main.result', survey_id=survey.id))
+    
     return render_template('main/survey.html', form=form)
 
 #@main_bp.route('/result/<int:survey_id>')
@@ -49,7 +63,11 @@ def survey():
 def result(survey_id):
     survey = SurveyResponse.query.get_or_404(survey_id)
     prob = predict_click_probability(survey)
-    image_name = generate_user_plot(current_user.id, survey)
+    
+    # Generate and save the plot
+    plot_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{current_user.id}.png')
+    image_name = generate_user_plot(survey, plot_path)
+    
     return render_template('main/result.html', prob=prob, ad='ad1.jpg', user_result_path=image_name)
 
 @main_bp.route('/download_regression/<int:user_id>')

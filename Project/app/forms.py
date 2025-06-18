@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField, SelectField, TextAreaField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField, SelectField, TextAreaField, SelectMultipleField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, NumberRange
+from flask_wtf.file import FileRequired, FileAllowed
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -20,9 +21,7 @@ class SurveyForm(FlaskForm):
     daily_online_hours = FloatField('Hours Online per Day', validators=[DataRequired()])
     device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')])
     interests = TextAreaField('Your Interests (comma separated)', validators=[DataRequired()])
-    selected_ads = SelectMultipleField('Which Ads Do You Like?', choices=[
-        ('ad1.jpg', 'Ad 1'), ('ad2.jpg', 'Ad 2'), ('ad3.jpg', 'Ad 3')
-    ])
+    selected_ad = SelectField('Select Your Favorite Ad', validators=[DataRequired()])
     submit = SubmitField('Submit Survey')
 
 class EditUserForm(FlaskForm):
@@ -35,4 +34,11 @@ class ProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[Email()])
     submit = SubmitField('Update Profile')
+
+class AdUploadForm(FlaskForm):
+    ad_image = FileField('Upload Ad Image', validators=[
+        FileRequired(),
+        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')
+    ])
+    submit = SubmitField('Upload Ad')
 

@@ -9,6 +9,7 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+    MAIL_DEFAULT_SENDER = 'ATSivkov21@codingburgas.bg'
 
 class DevelopmentConfig(Config):
     DEBUG = True
