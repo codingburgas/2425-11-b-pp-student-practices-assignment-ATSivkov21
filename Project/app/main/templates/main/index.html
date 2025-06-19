@@ -3,17 +3,16 @@
 {% block title %}Home - Ad Predictor{% endblock %}
 
 {% block content %}
-<div class="text-center fade-in-up">
+<div class="text-center fade-in-up" style="position: absolute; top: 40%; left: 30%;">
   <h1 class="display-4">Welcome to Ad Predictor</h1>
   <p class="lead">
     Discover which ads you're most likely to engage with – powered by AI.
   </p>
-  <img src="{{ url_for('static', filename='ads/ad1.jpg') }}" class="img-fluid rounded shadow-lg mt-4 result-image" alt="Sample Ad">
   <div class="mt-4">
     {% if current_user.is_authenticated %}
       <a href="{{ url_for('main.survey') }}" class="btn btn-primary btn-lg">Take the Survey</a>
     {% else %}
-      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg me-3">Join Now</a>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg me-3" style="position: absolute; top: 90%; left: 40%;">Join Now</a>
       <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">Log In</a>
     {% endif %}
   </div>
