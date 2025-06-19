@@ -7,7 +7,7 @@ from app import create_app, db
 # 📋 Моделът за съхранени отговори от анкетата
 from app.models import SurveyResponse
 # 🧠 Импорт на логистичния модел и пътя, където се записва
-from ai_model import model, MODEL_PATH
+from app.utils.ai_model import model, MODEL_PATH
 
 
 def get_training_data():

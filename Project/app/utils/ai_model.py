@@ -57,7 +57,7 @@ class SimpleLogisticRegression:
             
             # Изчисляване на метрики за мониторинг
             if epoch % 10 == 0:  # Записваме на всеки 10 епохи
-                loss = log_loss(y, y_predicted)
+                loss = log_loss(y, y_predicted, labels=[0, 1])
                 accuracy = accuracy_score(y, self.predict(X))
                 self.training_history['loss'].append(loss)
                 self.training_history['accuracy'].append(accuracy)
@@ -70,7 +70,7 @@ class SimpleLogisticRegression:
         metrics = {
             'accuracy': accuracy_score(y_test, y_pred),
             'mse': mean_squared_error(y_test, y_pred_proba),
-            'log_loss': log_loss(y_test, y_pred_proba),
+            'log_loss': log_loss(y_test, y_pred_proba, labels=[0, 1]),
             'training_loss': self.training_history['loss'][-1] if self.training_history['loss'] else None,
             'training_accuracy': self.training_history['accuracy'][-1] if self.training_history['accuracy'] else None
         }

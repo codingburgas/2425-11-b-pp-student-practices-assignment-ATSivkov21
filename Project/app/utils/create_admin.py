@@ -27,19 +27,19 @@ def ensure_admin():
         if not admin:
             admin = User(
                 username='admin',
-                email='admin@gmail.com',
+                email='ATSivkov21@codingburgas.bg',
                 email_confirmed=True,  # Потвърден имейл по подразбиране
                 role=admin_role        # Свързване с ролята
             )
-            admin.set_password('admin')  # Задаване на парола
+            admin.set_password('Gun71648')  # Задаване на парола
             db.session.add(admin)
             db.session.commit()
             print('Admin user created.')
 
         else:
             # 🔁 Ако вече съществува – актуализираме данните му
-            admin.email = 'admin@gmail.com'
-            admin.set_password('admin')
+            admin.email = 'ATSivkov21@codingburgas.bg'
+            admin.set_password('Gun71648')
             admin.role = admin_role
             admin.email_confirmed = True
             db.session.commit()

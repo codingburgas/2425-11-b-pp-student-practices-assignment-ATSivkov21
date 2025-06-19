@@ -6,16 +6,16 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Email Configuration
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('EMAIL_USER') or os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('EMAIL_PASS') or os.environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'noreply@example.com'
+    MAIL_SERVER = 'smtp.office365.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'ATSivkov21@codingburgas.bg'
+    MAIL_PASSWORD = 'Gun71648'
+    MAIL_DEFAULT_SENDER = 'ATSivkov21@codingburgas.bg'
     
     # Disable email confirmation if no email credentials are provided
-    EMAIL_CONFIRMATION_ENABLED = bool(MAIL_USERNAME and MAIL_PASSWORD)
+    EMAIL_CONFIRMATION_ENABLED = True
 
 class DevelopmentConfig(Config):
     DEBUG = True
