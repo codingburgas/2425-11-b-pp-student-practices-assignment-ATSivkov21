@@ -1,0 +1,141 @@
+{% extends 'layout.html' %}
+{% block title %}Model Monitoring{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">AI Model Monitoring Dashboard</h2>
+    
+    {% if metrics %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Model Performance Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <td><strong>Accuracy:</strong></td>
+                            <td>
+                                <span class="badge {% if metrics.accuracy > 0.8 %}bg-success{% elif metrics.accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ "%.2f"|format(metrics.accuracy * 100) }}%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mean Squared Error:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.mse) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Log Loss:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.log_loss) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Final Training Loss:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.training_loss) if metrics.training_loss else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Final Training Accuracy:</strong></td>
+                            <td>
+                                {% if metrics.training_accuracy %}
+                                <span class="badge {% if metrics.training_accuracy > 0.8 %}bg-success{% elif metrics.training_accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ "%.2f"|format(metrics.training_accuracy * 100) }}%
+                                </span>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Training History</h5>
+                </div>
+                <div class="card-body">
+                    {% if training_history.loss %}
+                    <h6>Loss Progression:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for i in range(training_history.loss|length) %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Epoch {{ (i + 1) * 10 }}</span>
+                            <span>Loss: {{ "%.4f"|format(training_history.loss[i]) }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No training history available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Model Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Model Health</h6>
+                                {% if metrics.accuracy > 0.8 %}
+                                <span class="badge bg-success fs-6">Excellent</span>
+                                {% elif metrics.accuracy > 0.6 %}
+                                <span class="badge bg-warning fs-6">Good</span>
+                                {% else %}
+                                <span class="badge bg-danger fs-6">Needs Improvement</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Overfitting Check</h6>
+                                {% if metrics.training_accuracy and metrics.accuracy %}
+                                    {% set diff = metrics.training_accuracy - metrics.accuracy %}
+                                    {% if diff > 0.1 %}
+                                    <span class="badge bg-warning fs-6">Potential Overfitting</span>
+                                    {% else %}
+                                    <span class="badge bg-success fs-6">Good Generalization</span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="badge bg-secondary fs-6">Unknown</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Recommendation</h6>
+                                {% if metrics.accuracy < 0.6 %}
+                                <span class="badge bg-danger fs-6">Retrain Model</span>
+                                {% elif metrics.accuracy < 0.8 %}
+                                <span class="badge bg-warning fs-6">Collect More Data</span>
+                                {% else %}
+                                <span class="badge bg-success fs-6">Model Ready</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p class="lead">No model metrics available.</p>
+        <p>Train the model first to see monitoring data.</p>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %} 

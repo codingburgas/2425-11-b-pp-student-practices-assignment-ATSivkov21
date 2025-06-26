@@ -16,7 +16,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-blue-dark shadow-lg fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand animate__animated animate__pulse" href="{{ url_for('main.index') }}">
+      <a class="navbar-brand animate__animated animate__pulse" href="{{ url_for('main.index') }}" style="color: #1b4965;">
         <i class="fas fa-ad me-2"></i>Ad Predictor
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -26,40 +26,44 @@
         <ul class="navbar-nav ms-auto">
           {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.survey') }}">
+              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.survey') }}" style="color: #1b4965;">
                 <i class="fas fa-poll me-1"></i>Survey
               </a>
             </li>
             <li class="nav-item">
+<<<<<<< HEAD
               <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.view_predictions') }}">
                 <i class="fas fa-chart-bar me-1"></i>Predictions
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.profile') }}">
+=======
+              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.profile') }}" style="color: #1b4965;">
+>>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
                 <i class="fas fa-user me-1"></i>Profile
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.logout') }}">
+              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.logout') }}" style="color: #1b4965;">
                 <i class="fas fa-sign-out-alt me-1"></i>Logout
               </a>
             </li>
             {% if current_user.role and current_user.role.name == 'admin' %}
               <li class="nav-item">
-                <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('admin.dashboard') }}">
+                <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('admin.dashboard') }}" style="color: #1b4965;">
                   <i class="fas fa-user-shield me-1"></i>Admin
                 </a>
               </li>
             {% endif %}
           {% else %}
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.login') }}">
+              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.login') }}" style="color: #1b4965;">
                 <i class="fas fa-sign-in-alt me-1"></i>Login
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.register') }}">
+              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.register') }}" style="color: #1b4965;">
                 <i class="fas fa-user-plus me-1"></i>Register
               </a>
             </li>
@@ -88,11 +92,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <h5 class="animate__animated animate__fadeIn"><i class="fas fa-ad me-2"></i>Ad Predictor</h5>
-          <p class="animate__animated animate__fadeIn">AI-powered ad engagement prediction platform.</p>
+          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);"><i class="fas fa-ad me-2" style="color: rgb(13, 110, 253);"></i>Ad Predictor</h5>
+          <p class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">AI-powered ad engagement prediction platform.</p>
         </div>
         <div class="col-md-3">
-          <h5 class="animate__animated animate__fadeIn">Links</h5>
+          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">Links</h5>
           <ul class="nav flex-column">
             <li class="nav-item animate__animated animate__fadeIn">
               <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
@@ -106,7 +110,7 @@
           </ul>
         </div>
         <div class="col-md-3">
-          <h5 class="animate__animated animate__fadeIn">Contact</h5>
+          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">Contact</h5>
           <ul class="nav flex-column">
             <li class="nav-item animate__animated animate__fadeIn">
               <a class="nav-link" href="#"><i class="fas fa-envelope me-2"></i>ATSivkov21@codingburgas.bg</a>
@@ -119,7 +123,7 @@
       </div>
       <hr class="mt-4 mb-4">
       <div class="text-center animate__animated animate__fadeIn">
-        <p class="mb-0">&copy; 2025 Ad Predictor. All rights reserved.</p>
+        <p class="mb-0" style="color: #1b4965;">&copy; 2025 Ad Predictor. All rights reserved.</p>
       </div>
     </div>
   </footer>
