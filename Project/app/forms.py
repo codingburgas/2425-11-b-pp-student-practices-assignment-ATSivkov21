@@ -23,12 +23,15 @@ class SurveyForm(FlaskForm):
     selected_ads = SelectMultipleField('Which Ads Do You Like?', choices=[
         ('ad1.jpg', 'Ad 1'), ('ad2.jpg', 'Ad 2'), ('ad3.jpg', 'Ad 3')
     ])
+    streaming_apps_count = IntegerField('Number of Streaming Applications You Use', validators=[DataRequired(), NumberRange(min=0, max=20)])
+    video_clip_length = FloatField('Average Video Clip Length (minutes)', validators=[DataRequired(), NumberRange(min=0, max=300)])
     submit = SubmitField('Submit Survey')
 
 class EditUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[Email()])
     email_confirmed = BooleanField('Email Confirmed')
+    is_admin = BooleanField('Make Admin')
     submit = SubmitField('Save Changes')
 
 class ProfileForm(FlaskForm):

@@ -1,10 +1,10 @@
-Flask
+Flask==2.0.1
 Flask-Bootstrap
-Flask-WTF
-Flask-SQLAlchemy
-Flask-Login
-Flask-Migrate
-Flask-Mail
+Flask-WTF==0.15.1
+Flask-SQLAlchemy==2.5.1
+Flask-Login==0.5.0
+Flask-Migrate==3.1.0
+Flask-Mail==0.9.1
 email-validator
 itsdangerous
 python-dotenv
@@ -13,3 +13,5 @@ numpy
 pandas
 matplotlib
 pytest
+reportlab
+scikit-learn

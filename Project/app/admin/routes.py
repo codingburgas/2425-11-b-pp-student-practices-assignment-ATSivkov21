@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, send_file, make_response, current_app
 from flask_login import login_required, current_user
 from app.admin import admin_bp
-from app.models import User, SurveyResponse
+from app.models import User, SurveyResponse, Role
 from app.forms import EditUserForm
 from app import db
 import csv
@@ -123,11 +123,36 @@ def download_user_plot(user_id):
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     form = EditUserForm(obj=user)
+    
+    # Set the is_admin field based on current user role
+    if user.role and user.role.name == 'admin':
+        form.is_admin.data = True
+    else:
+        form.is_admin.data = False
 
     if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
         user.email_confirmed = form.email_confirmed.data
+        
+        # Handle admin role assignment
+        if form.is_admin.data:
+            admin_role = Role.query.filter_by(name='admin').first()
+            if not admin_role:
+                admin_role = Role(name='admin')
+                db.session.add(admin_role)
+                db.session.flush()
+            user.role = admin_role
+        else:
+            # Remove admin role if unchecked
+            if user.role and user.role.name == 'admin':
+                user_role = Role.query.filter_by(name='user').first()
+                if not user_role:
+                    user_role = Role(name='user')
+                    db.session.add(user_role)
+                    db.session.flush()
+                user.role = user_role
+        
         db.session.commit()
         flash('User updated successfully!', 'success')
         return redirect(url_for('admin.dashboard'))

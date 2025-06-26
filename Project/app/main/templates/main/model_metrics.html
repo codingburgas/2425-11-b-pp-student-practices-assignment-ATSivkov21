@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Model Performance Metrics</h2>
+    
+    {% if metrics %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Model Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <td><strong>Accuracy:</strong></td>
+                            <td>{{ "%.3f"|format(metrics.accuracy) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Precision:</strong></td>
+                            <td>{{ "%.3f"|format(metrics.precision) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Recall:</strong></td>
+                            <td>{{ "%.3f"|format(metrics.recall) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F1-Score:</strong></td>
+                            <td>{{ "%.3f"|format(metrics.f1_score) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Log Loss (Entropy):</strong></td>
+                            <td>{{ "%.3f"|format(metrics.logloss) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Training Date:</strong></td>
+                            <td>{{ metrics.training_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Confusion Matrix</h5>
+                </div>
+                <div class="card-body">
+                    {% if metrics.confusion_matrix %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Predicted Negative</th>
+                                <th>Predicted Positive</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Actual Negative</strong></td>
+                                <td>{{ metrics.confusion_matrix[0][0] }}</td>
+                                <td>{{ metrics.confusion_matrix[0][1] }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Actual Positive</strong></td>
+                                <td>{{ metrics.confusion_matrix[1][0] }}</td>
+                                <td>{{ metrics.confusion_matrix[1][1] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>Confusion matrix not available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Feature Importance (Information Gain)</h5>
+                </div>
+                <div class="card-body">
+                    {% if feature_importance %}
+                    <div class="row">
+                        {% for feature, importance in feature_importance.items() %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>{{ feature.replace('_', ' ').title() }}:</span>
+                                <span class="badge bg-primary">{{ "%.4f"|format(importance) }}</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ (importance / feature_importance.values()|max) * 100 }}%">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p>Feature importance not available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
+                Retrain Model
+            </a>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="alert alert-info">
+        <h4>No Model Metrics Available</h4>
+        <p>The model hasn't been trained yet or there's not enough data. You need at least 10 survey responses to train the model.</p>
+        <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">Train Model</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.progress {
+    height: 20px;
+    margin-top: 5px;
+}
+.progress-bar {
+    background-color: #007bff;
+}
+</style>
+{% endblock %} 
