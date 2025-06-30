@@ -16,27 +16,15 @@ class Role(db.Model):
 
 # Модел за потребител в системата
 class User(UserMixin, db.Model):
-<<<<<<< HEAD
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     email_confirmed = db.Column(db.Boolean, default=False)
-    share_predictions = db.Column(db.Boolean, default=False)
+    share_results = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     survey_responses = db.relationship('SurveyResponse', backref='user', lazy=True)
     ad_clicks = db.relationship('AdClick', backref='user', lazy=True)
-=======
-    id = db.Column(db.Integer, primary_key=True)  # Уникален ID на потребителя
-    username = db.Column(db.String(64), unique=True, nullable=False)  # Потребителско име, задължително и уникално
-    email = db.Column(db.String(120), unique=True, nullable=False)  # Имейл, задължителен и уникален
-    password_hash = db.Column(db.String(128))  # Хеширана парола
-    email_confirmed = db.Column(db.Boolean, default=False)  # Дали имейлът е потвърден (по подразбиране False)
-    share_results = db.Column(db.Boolean, default=False)  # Дали потребителят дава съгласие за споделяне на резултати
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))  # Външен ключ към ролята на потребителя
-    survey_responses = db.relationship('SurveyResponse', backref='user', lazy=True)  # Всички отговори на анкети, свързани с този потребител
-    ad_clicks = db.relationship('AdClick', backref='user', lazy=True)  # Всички кликвания на реклами от този потребител
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 
     # Метод за задаване на парола (хеширане)
     def set_password(self, password):
@@ -48,31 +36,20 @@ class User(UserMixin, db.Model):
 
 # Модел за отговор от анкета на потребител
 class SurveyResponse(db.Model):
-<<<<<<< HEAD
     id = db.Column(db.Integer, primary_key=True)
     age = db.Column(db.Integer)
     daily_online_hours = db.Column(db.Float)
     device = db.Column(db.String(64))
     interests = db.Column(db.String(256))
+    social_media = db.Column(db.String(500))  # Names of social media platforms (comma-separated)
     selected_ads = db.Column(db.String(200), nullable=True)
     streaming_apps_count = db.Column(db.Integer, default=0)  # Number of streaming applications
     video_clip_length = db.Column(db.Float, default=0.0)  # Average video clip length in minutes
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-=======
-    id = db.Column(db.Integer, primary_key=True)  # Уникален ID на отговора
-    age = db.Column(db.Integer)  # Възраст на потребителя
-    daily_online_hours = db.Column(db.Float)  # Часове онлайн на ден
-    device = db.Column(db.String(64))  # Използвано устройство (PC, Mobile и т.н.)
-    interests = db.Column(db.String(256))  # Интереси (текст)
-    selected_ads = db.Column(db.String(200), nullable=True)  # Избрани реклами (по избор)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # Време на попълване, по подразбиране текущо време
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Външен ключ към потребителя, който е попълнил анкетата
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 
 # Модел за запис на кликвания върху реклами
 class AdClick(db.Model):
-<<<<<<< HEAD
     id = db.Column(db.Integer, primary_key=True)
     ad_name = db.Column(db.String(100), nullable=False)
     clicked_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -89,9 +66,3 @@ class ModelWeights(db.Model):
     recall = db.Column(db.Float)
     f1_score = db.Column(db.Float)
     logloss = db.Column(db.Float)
-=======
-    id = db.Column(db.Integer, primary_key=True)  # Уникален ID на кликването
-    ad_name = db.Column(db.String(100), nullable=False)  # Име на рекламата, задължително поле
-    clicked_at = db.Column(db.DateTime, server_default=db.func.now())  # Време на кликването, задава се автоматично
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Външен ключ към потребителя, който е кликнал
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818

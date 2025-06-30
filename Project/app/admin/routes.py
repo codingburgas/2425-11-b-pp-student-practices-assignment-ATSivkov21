@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 # Импорт на Blueprint за admin
 from app.admin import admin_bp
 # Импортиране на базовите модели
-from app.models import User, SurveyResponse, AdClick
+from app.models import User, SurveyResponse, AdClick, Role
 # Форми за редакция на потребители и качване на реклами
 from app.forms import EditUserForm, AdUploadForm
 from app import db

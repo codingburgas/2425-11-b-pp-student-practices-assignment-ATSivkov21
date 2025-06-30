@@ -168,17 +168,22 @@ Based on information gain calculations, the features are ranked by their predict
    - **Insight**: Detailed interests indicate higher engagement potential
    - **Recommendation**: Target users with comprehensive interest profiles
 
-5. **ad_count** (Information Gain: ~0.03-0.10)
+5. **social_media_length** (Information Gain: ~0.04-0.10)
+   - **Conclusion**: Social media usage patterns provide predictive value
+   - **Insight**: Users with more social media platforms may be more engaged online
+   - **Recommendation**: Social media-based targeting strategies
+
+6. **ad_count** (Information Gain: ~0.03-0.10)
    - **Conclusion**: Number of selected ads provides some predictive value
    - **Insight**: Users who engage with multiple ads may be more receptive
    - **Recommendation**: Consider ad selection behavior in targeting
 
-6. **streaming_apps_count_normalized** (Information Gain: ~0.02-0.08)
+7. **streaming_apps_count_normalized** (Information Gain: ~0.02-0.08)
    - **Conclusion**: Streaming app usage has moderate predictive value
    - **Insight**: Entertainment-focused users may respond to certain ad types
    - **Recommendation**: Content-based ad targeting
 
-7. **video_clip_length_normalized** (Information Gain: ~0.01-0.05)
+8. **video_clip_length_normalized** (Information Gain: ~0.01-0.05)
    - **Conclusion**: Video consumption patterns have limited predictive value
    - **Insight**: Video length preference may indicate attention span
    - **Recommendation**: Consider for video ad optimization
@@ -206,6 +211,7 @@ Based on the comprehensive metrics analysis, the enhanced softmax logistic regre
 - Use age and online activity as primary targeting criteria
 - Implement device-specific ad formats and messaging
 - Focus on users with detailed interest profiles
+- Leverage social media usage patterns for platform-specific targeting
 
 **2. Model Deployment Strategy**
 - Monitor precision closely to avoid wasted ad spend
@@ -216,6 +222,7 @@ Based on the comprehensive metrics analysis, the enhanced softmax logistic regre
 - Collect more granular age data (age brackets)
 - Track time-of-day online activity patterns
 - Gather device-specific interaction data
+- Analyze social media platform preferences and usage frequency
 
 **4. Performance Monitoring**
 - Set up automated alerts for metric degradation
@@ -250,7 +257,11 @@ class SoftmaxLogisticRegression:
         self.bias = None
         self.num_classes = num_classes
         self.scaler = StandardScaler()
-        self.feature_names = [...]
+        self.feature_names = [
+            'age_normalized', 'daily_online_hours_normalized', 'device_score',
+            'interests_length', 'social_media_length', 'ad_count', 
+            'streaming_apps_count_normalized', 'video_clip_length_normalized'
+        ]
         self.metrics = {}
         self.training_history = {'loss': [], 'accuracy': []}
         self.feature_importance = {}
@@ -301,9 +312,10 @@ def plot_feature_importance(self, save_path=None):
 2. **daily_online_hours_normalized**: Daily online hours normalized to [0,1]
 3. **device_score**: Device type encoded (PC=0, Mobile=0.5, Tablet=1)
 4. **interests_length**: Length of interests text normalized to [0,1]
-5. **ad_count**: Number of selected ads normalized to [0,1]
-6. **streaming_apps_count_normalized**: Streaming apps count normalized to [0,1]
-7. **video_clip_length_normalized**: Video clip length normalized to [0,1]
+5. **social_media_length**: Length of social media platforms list normalized to [0,1]
+6. **ad_count**: Number of selected ads normalized to [0,1]
+7. **streaming_apps_count_normalized**: Streaming apps count normalized to [0,1]
+8. **video_clip_length_normalized**: Video clip length normalized to [0,1]
 
 ### Information Gain Justification
 Each feature is evaluated using **information gain** to measure its contribution to the model's predictive power:

@@ -49,6 +49,7 @@ def survey():
             daily_online_hours=form.daily_online_hours.data,
             device=form.device.data,
             interests=form.interests.data,
+            social_media=form.social_media.data,
             selected_ads=','.join(form.selected_ads.data),
             streaming_apps_count=form.streaming_apps_count.data,
             video_clip_length=form.video_clip_length.data,
@@ -93,7 +94,6 @@ def download_regression(user_id):
     return send_file(file_path, as_attachment=True)  # Изпращане като файл за сваляне
 
 @main_bp.route('/ad_click/<ad_name>')
-@main_bp.route('/ad_click/<ad_name>')
 @login_required
 def ad_click(ad_name):
     # Създаване на запис за клик върху реклама
@@ -127,15 +127,15 @@ def profile():
 @main_bp.route('/toggle_sharing', methods=['POST'])
 @login_required
 def toggle_sharing():
-    current_user.share_predictions = not current_user.share_predictions
+    current_user.share_results = not current_user.share_results
     db.session.commit()
-    return jsonify({'status': 'success', 'sharing': current_user.share_predictions})
+    return jsonify({'status': 'success', 'sharing': current_user.share_results})
 
 @main_bp.route('/view_predictions')
 @login_required
 def view_predictions():
     # Get all users who have consented to share their predictions
-    users = User.query.filter_by(share_predictions=True).all()
+    users = User.query.filter_by(share_results=True).all()
     predictions = []
     
     for user in users:

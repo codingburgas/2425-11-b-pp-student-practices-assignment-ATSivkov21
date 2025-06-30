@@ -10,7 +10,7 @@
       <div class="mb-3">{{ form.daily_online_hours.label }}{{ form.daily_online_hours(class="form-control") }}</div>
       <div class="mb-3">{{ form.device.label }}{{ form.device(class="form-select") }}</div>
       <div class="mb-3">{{ form.interests.label }}{{ form.interests(class="form-control", rows=3) }}</div>
-<<<<<<< HEAD
+      <div class="mb-3">{{ form.social_media.label }}{{ form.social_media(class="form-control", rows=3, placeholder="e.g., Facebook, Instagram, TikTok, Twitter, LinkedIn, YouTube, Snapchat") }}</div>
       <div class="mb-3">{{ form.streaming_apps_count.label }}{{ form.streaming_apps_count(class="form-control") }}</div>
       <div class="mb-3">{{ form.video_clip_length.label }}{{ form.video_clip_length(class="form-control") }}</div>
       <div class="mb-3">
@@ -22,24 +22,6 @@
               <img src="{{ url_for('static', filename='ads/' ~ ad) }}" alt="Ad" style="width:120px; display:block; margin:0 auto 5px auto; border-radius:8px; border:1px solid #ccc;">
               <div>{{ ad }}</div>
             </label>
-=======
-      
-      <div class="mb-4">
-        <h4>Select Your Favorite Ad</h4>
-        <div class="row">
-          {% for value, label in form.selected_ad.choices %}
-            <div class="col-md-4 mb-3">
-              <div class="card h-100">
-                <img src="{{ url_for('static', filename='ads/' + value) }}" class="card-img-top" alt="{{ label }}">
-                <div class="card-body">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="selected_ad" id="ad_{{ loop.index }}" value="{{ value }}" {% if form.selected_ad.data == value %}checked{% endif %}>
-                    <label class="form-check-label" for="ad_{{ loop.index }}">{{ label }}</label>
-                  </div>
-                </div>
-              </div>
-            </div>
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
           {% endfor %}
         </div>
       </div>

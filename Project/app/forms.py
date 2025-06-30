@@ -21,40 +21,25 @@ class LoginForm(FlaskForm):
 
 # Форма за попълване на анкета
 class SurveyForm(FlaskForm):
-<<<<<<< HEAD
     age = IntegerField('Your Age', validators=[DataRequired(), NumberRange(min=10, max=100)])
     daily_online_hours = FloatField('Hours Online per Day', validators=[DataRequired()])
     device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')])
     interests = TextAreaField('Your Interests (comma separated)', validators=[DataRequired()])
+    social_media = TextAreaField('Social Media Platforms (comma separated, e.g., Facebook, Instagram, TikTok)', validators=[DataRequired()])
     selected_ads = SelectMultipleField('Which Ads Do You Like?', choices=[
         ('ad1.jpg', 'Ad 1'), ('ad2.jpg', 'Ad 2'), ('ad3.jpg', 'Ad 3')
     ])
     streaming_apps_count = IntegerField('Number of Streaming Applications You Use', validators=[DataRequired(), NumberRange(min=0, max=20)])
     video_clip_length = FloatField('Average Video Clip Length (minutes)', validators=[DataRequired(), NumberRange(min=0, max=300)])
     submit = SubmitField('Submit Survey')
-=======
-    age = IntegerField('Your Age', validators=[DataRequired(), NumberRange(min=10, max=100)])  # Поле за възраст с проверка за диапазон от 10 до 100 години
-    daily_online_hours = FloatField('Hours Online per Day', validators=[DataRequired()])  # Поле за часове онлайн на ден, задължително
-    device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')])  # Избор от списък за устройство
-    interests = TextAreaField('Your Interests (comma separated)', validators=[DataRequired()])  # Текстово поле за интереси, задължително
-    selected_ad = SelectField('Select Your Favorite Ad', validators=[DataRequired()])  # Избор на любима реклама, задължително
-    submit = SubmitField('Submit Survey')  # Бутон за изпращане на анкетата
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 
 # Форма за редактиране на потребителски данни (от администратор или потребител)
 class EditUserForm(FlaskForm):
-<<<<<<< HEAD
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[Email()])
     email_confirmed = BooleanField('Email Confirmed')
     is_admin = BooleanField('Make Admin')
     submit = SubmitField('Save Changes')
-=======
-    username = StringField('Username', validators=[DataRequired()])  # Поле за потребителско име, задължително
-    email = StringField('Email', validators=[Email()])  # Поле за имейл с валидатор
-    email_confirmed = BooleanField('Email Confirmed')  # Чекбокс за потвърждение на имейл
-    submit = SubmitField('Save Changes')  # Бутон за записване на промените
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 
 # Форма за обновяване на профила (например от потребителя самия)
 class ProfileForm(FlaskForm):

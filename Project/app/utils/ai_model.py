@@ -25,7 +25,7 @@ class SoftmaxLogisticRegression:
         self.scaler = StandardScaler()
         self.feature_names = [
             'age_normalized', 'daily_online_hours_normalized', 'device_score',
-            'interests_length', 'ad_count', 'streaming_apps_count_normalized',
+            'interests_length', 'social_media_length', 'ad_count', 'streaming_apps_count_normalized',
             'video_clip_length_normalized'
         ]
         self.metrics = {}
@@ -215,11 +215,26 @@ class SoftmaxLogisticRegression:
 
     def save_to_db(self):
         """Save model weights and metrics to database"""
+        if self.weights is None:
+            raise ValueError("Model weights are not initialized. Train the model first.")
+        
         weights_json = json.dumps(self.weights.tolist())
+        
+        # Handle bias conversion safely
+        if self.bias is None:
+            bias_value = 0.0
+        elif self.num_classes == 2:
+            bias_value = float(self.bias)
+        else:
+            # For multi-class, bias is a numpy array
+            if hasattr(self.bias, 'tolist'):
+                bias_value = json.dumps(self.bias.tolist())
+            else:
+                bias_value = json.dumps([float(self.bias)])
         
         model_weights = ModelWeights(
             weights=weights_json,
-            bias=float(self.bias) if self.num_classes == 2 else json.dumps(self.bias.tolist()),
+            bias=bias_value,
             accuracy=self.metrics.get('accuracy', 0.0),
             precision=self.metrics.get('precision', 0.0),
             recall=self.metrics.get('recall', 0.0),
@@ -372,6 +387,7 @@ def prepare_training_data():
         
         # Prepare features
         interests_len = len(survey.interests or "") / 256
+        social_media_len = len(survey.social_media or "") / 500  # Normalized social media length
         ad_count = len((survey.selected_ads or "").split(',')) / 3
         device_score = 0 if survey.device == 'PC' else (1 if survey.device == 'Mobile' else 2) / 2
         
@@ -380,6 +396,7 @@ def prepare_training_data():
             survey.daily_online_hours / 24,  # Normalized hours
             device_score,
             interests_len,
+            social_media_len,
             ad_count,
             survey.streaming_apps_count / 20,  # Normalized streaming apps
             survey.video_clip_length / 300  # Normalized video length
@@ -423,6 +440,7 @@ model = SoftmaxLogisticRegression(num_classes=2)
 def predict_click_probability(survey):
     """Predict click probability for a survey response"""
     interests_len = len(survey.interests or "") / 256
+    social_media_len = len(survey.social_media or "") / 500  # Normalized social media length
     ad_count = len((survey.selected_ads or "").split(',')) / 3
     device_score = 0 if survey.device == 'PC' else (1 if survey.device == 'Mobile' else 2) / 2
 
@@ -432,6 +450,7 @@ def predict_click_probability(survey):
         survey.daily_online_hours / 24,
         device_score,
         interests_len,
+        social_media_len,
         ad_count,
         survey.streaming_apps_count / 20,
         survey.video_clip_length / 300
