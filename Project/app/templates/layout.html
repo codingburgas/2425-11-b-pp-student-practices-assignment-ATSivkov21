@@ -3,67 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Ad Predictor{% endblock %}</title>
+  <title>{% block title %}Ad Predictor - AI-Powered Ad Engagement{% endblock %}>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
-<body class="deep-blue-bg">
-  <div class="particles-js" id="particles-js"></div>
-  <div class="blue-wave-animation"></div>
+<body class="modern-bg">
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-overlay">
+    <div class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-white">Loading Ad Predictor...</p>
+    </div>
+  </div>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-blue-dark shadow-lg fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand animate__animated animate__pulse" href="{{ url_for('main.index') }}" style="color: #1b4965;">
-        <i class="fas fa-ad me-2"></i>Ad Predictor
+  <!-- Particles Background -->
+  <div class="particles-js" id="particles-js"></div>
+  
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark modern-navbar fixed-top" id="mainNavbar">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
+        <div class="brand-icon me-2">
+          <i class="fas fa-brain"></i>
+        </div>
+        <span class="brand-text">Ad Predictor</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+      
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.survey') }}" style="color: #1b4965;">
+              <a class="nav-link" href="{{ url_for('main.index') }}">
+                <i class="fas fa-home me-1"></i>Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.survey') }}">
                 <i class="fas fa-poll me-1"></i>Survey
               </a>
             </li>
             <li class="nav-item">
-<<<<<<< HEAD
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.view_predictions') }}">
-                <i class="fas fa-chart-bar me-1"></i>Predictions
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.profile') }}">
-=======
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('main.profile') }}" style="color: #1b4965;">
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
+              <a class="nav-link" href="{{ url_for('main.profile') }}">
                 <i class="fas fa-user me-1"></i>Profile
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.logout') }}" style="color: #1b4965;">
-                <i class="fas fa-sign-out-alt me-1"></i>Logout
-              </a>
-            </li>
             {% if current_user.role and current_user.role.name == 'admin' %}
-              <li class="nav-item">
-                <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('admin.dashboard') }}" style="color: #1b4965;">
-                  <i class="fas fa-user-shield me-1"></i>Admin
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="fas fa-cog me-1"></i>Admin
                 </a>
+                <ul class="dropdown-menu modern-dropdown">
+                  <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                  </a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('admin.model_monitoring') }}">
+                    <i class="fas fa-chart-line me-2"></i>Model Monitoring
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ url_for('main.model_metrics') }}">
+                    <i class="fas fa-chart-bar me-2"></i>Metrics
+                  </a></li>
+                </ul>
               </li>
             {% endif %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-user-circle me-1"></i>{{ current_user.username }}
+              </a>
+              <ul class="dropdown-menu modern-dropdown">
+                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}">
+                  <i class="fas fa-user-edit me-2"></i>Edit Profile
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.generate_report') }}">
+                  <i class="fas fa-download me-2"></i>Download Report
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a></li>
+              </ul>
+            </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.login') }}" style="color: #1b4965;">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">
                 <i class="fas fa-sign-in-alt me-1"></i>Login
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link animate__animated animate__fadeIn" href="{{ url_for('auth.register') }}" style="color: #1b4965;">
+              <a class="nav-link btn btn-primary btn-sm ms-2" href="{{ url_for('auth.register') }}">
                 <i class="fas fa-user-plus me-1"></i>Register
               </a>
             </li>
@@ -73,73 +121,184 @@
     </div>
   </nav>
 
-  <div class="container py-5 mt-5">
+  <!-- Main Content -->
+  <main class="main-content">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
+        <div class="container mt-5 pt-5">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show modern-alert" role="alert">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'warning' else 'info-circle' if category == 'info' else 'times-circle' }} me-2"></i>
+                <span>{{ message }}</span>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
-  </div>
+  </main>
 
-  <footer class="footer bg-blue-dark text-light py-4">
+  <!-- Footer -->
+  <footer class="modern-footer">
     <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);"><i class="fas fa-ad me-2" style="color: rgb(13, 110, 253);"></i>Ad Predictor</h5>
-          <p class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">AI-powered ad engagement prediction platform.</p>
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-section">
+            <div class="footer-brand d-flex align-items-center mb-3">
+              <div class="brand-icon me-2">
+                <i class="fas fa-brain"></i>
+              </div>
+              <span class="brand-text">Ad Predictor</span>
+            </div>
+            <p class="footer-description">
+              AI-powered platform for predicting ad engagement and optimizing marketing campaigns with machine learning.
+            </p>
+            <div class="social-links">
+              <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+              <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+              <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            </div>
+          </div>
         </div>
-        <div class="col-md-3">
-          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">Links</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item animate__animated animate__fadeIn">
-              <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-            </li>
-            <li class="nav-item animate__animated animate__fadeIn">
-              <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-            </li>
-            <li class="nav-item animate__animated animate__fadeIn">
-              <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-            </li>
-          </ul>
+        
+        <div class="col-lg-2 col-md-6">
+          <div class="footer-section">
+            <h5 class="footer-title">Platform</h5>
+            <ul class="footer-links">
+              <li><a href="{{ url_for('main.index') }}">Home</a></li>
+              <li><a href="{{ url_for('main.survey') }}">Survey</a></li>
+              <li><a href="{{ url_for('main.profile') }}">Profile</a></li>
+              <li><a href="{{ url_for('main.model_metrics') }}">Metrics</a></li>
+            </ul>
+          </div>
         </div>
-        <div class="col-md-3">
-          <h5 class="animate__animated animate__fadeIn" style="color: rgb(13, 110, 253);">Contact</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item animate__animated animate__fadeIn">
-              <a class="nav-link" href="#"><i class="fas fa-envelope me-2"></i>ATSivkov21@codingburgas.bg</a>
-            </li>
-            <li class="nav-item animate__animated animate__fadeIn">
-              <a class="nav-link" href="#"><i class="fas fa-phone me-2"></i>+89 238 3642</a>
-            </li>
-          </ul>
+        
+        <div class="col-lg-2 col-md-6">
+          <div class="footer-section">
+            <h5 class="footer-title">Account</h5>
+            <ul class="footer-links">
+              <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+              <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+              <li><a href="{{ url_for('main.profile') }}">Settings</a></li>
+              <li><a href="{{ url_for('main.generate_report') }}">Reports</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-section">
+            <h5 class="footer-title">Contact & Support</h5>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="fas fa-envelope me-2"></i>
+                <a href="mailto:ATSivkov21@codingburgas.bg">ATSivkov21@codingburgas.bg</a>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-phone me-2"></i>
+                <a href="tel:+892383642">+89 238 3642</a>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>Coding Burgas, Bulgaria</span>
+              </div>
+            </div>
+            <div class="newsletter mt-3">
+              <h6>Stay Updated</h6>
+              <div class="input-group">
+                <input type="email" class="form-control" placeholder="Enter your email">
+                <button class="btn btn-primary" type="button">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <hr class="mt-4 mb-4">
-      <div class="text-center animate__animated animate__fadeIn">
-        <p class="mb-0" style="color: #1b4965;">&copy; 2025 Ad Predictor. All rights reserved.</p>
+      
+      <hr class="footer-divider">
+      
+      <div class="footer-bottom">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <p class="mb-0">&copy; 2025 Ad Predictor. All rights reserved.</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="footer-bottom-links">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Cookie Policy</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
 
+  <!-- Back to Top Button -->
+  <button id="backToTop" class="back-to-top" title="Back to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script>AOS.init();</script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  
   <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Loading screen
+    window.addEventListener('load', function() {
+      const loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.style.opacity = '0';
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 500);
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('mainNavbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('navbar-scrolled');
+      } else {
+        navbar.classList.remove('navbar-scrolled');
+      }
+    });
+
+    // Back to top button
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+
+    backToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Initialize particles.js
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize particles.js with blue theme
       particlesJS('particles-js', {
         "particles": {
           "number": {
-            "value": 80,
+            "value": 60,
             "density": {
               "enable": true,
               "value_area": 800
@@ -153,13 +312,10 @@
             "stroke": {
               "width": 0,
               "color": "#000000"
-            },
-            "polygon": {
-              "nb_sides": 5
             }
           },
           "opacity": {
-            "value": 0.5,
+            "value": 0.4,
             "random": false,
             "anim": {
               "enable": false,
@@ -182,7 +338,7 @@
             "enable": true,
             "distance": 150,
             "color": "#1b4965",
-            "opacity": 0.4,
+            "opacity": 0.3,
             "width": 1
           },
           "move": {
@@ -205,7 +361,7 @@
           "events": {
             "onhover": {
               "enable": true,
-              "mode": "grab"
+              "mode": "repulse"
             },
             "onclick": {
               "enable": true,
@@ -215,7 +371,7 @@
           },
           "modes": {
             "grab": {
-              "distance": 140,
+              "distance": 400,
               "line_linked": {
                 "opacity": 1
               }

@@ -12,11 +12,7 @@ joblib
 numpy
 pandas
 matplotlib
-<<<<<<< HEAD
+seaborn
+scikit-learn
 pytest
 reportlab
-scikit-learn
-=======
-scikit-learn
-pytest
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818

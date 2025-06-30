@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-from flask import render_template, redirect, url_for, flash, request, send_file, current_app, jsonify
-=======
 # 🌐 Импорти от Flask за визуализация, пренасочване, съобщения, заявки, файлове и достъп до конфигурацията
-from flask import render_template, redirect, url_for, flash, request, send_file, current_app
+from flask import render_template, redirect, url_for, flash, request, send_file, current_app, jsonify
 # 🔐 Импорти за логин функционалност
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 from flask_login import login_required, current_user
 # 📘 Blueprint за основната част на приложението
 from app.main import main_bp
@@ -12,16 +8,10 @@ from app.main import main_bp
 from app.forms import SurveyForm, RegistrationForm, ProfileForm
 # 🗃️ SQLAlchemy базата данни
 from app import db
-<<<<<<< HEAD
-from app.models import SurveyResponse, AdClick, User
-from app.utils.ai_model import predict_click_probability, train_model, get_model_metrics, get_feature_importance
-=======
 # 👥 Модели: отговори от анкета и кликнати реклами
 from app.models import SurveyResponse, AdClick, User
 # 🤖 Модел за прогнозиране на вероятност за кликване
-from app.utils.ai_model import predict_click_probability
-# 📊 Функция за генериране и запис на графики (логистична регресия)
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
+from app.utils.ai_model import predict_click_probability, train_model, get_model_metrics, get_feature_importance, generate_model_plots
 from app.utils.plot_utils import generate_user_plot
 # 🎲 За избор на произволна реклама
 import random
@@ -45,7 +35,6 @@ def index():
 @main_bp.route('/survey', methods=['GET', 'POST'])
 @login_required
 def survey():
-<<<<<<< HEAD
     form = SurveyForm()
     ads_dir = os.path.join('static', 'ads')
     ad_images = [f for f in os.listdir(os.path.join(os.path.dirname(__file__), '..', ads_dir)) if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg')]
@@ -53,18 +42,6 @@ def survey():
         form.selected_ads.data = request.form.getlist('selected_ads')
     if form.selected_ads.data is None:
         form.selected_ads.data = []
-=======
-    form = SurveyForm()  # Създаване на форма за анкета
-
-    # Взимане на всички рекламни изображения от директорията
-    ads_dir = os.path.join(current_app.root_path, 'static', 'ads')
-    ad_images = [f for f in os.listdir(ads_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-
-    # Попълване на избираемите опции в анкетата с реклами
-    form.selected_ad.choices = [(img, f'Ad {i+1}') for i, img in enumerate(ad_images)]
-
-    # Ако потребителят е попълнил формата и тя е валидна
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
     if form.validate_on_submit():
         # Създаване на нов запис в SurveyResponse
         survey = SurveyResponse(
@@ -72,13 +49,9 @@ def survey():
             daily_online_hours=form.daily_online_hours.data,
             device=form.device.data,
             interests=form.interests.data,
-<<<<<<< HEAD
             selected_ads=','.join(form.selected_ads.data),
             streaming_apps_count=form.streaming_apps_count.data,
             video_clip_length=form.video_clip_length.data,
-=======
-            selected_ads=form.selected_ad.data,
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
             user_id=current_user.id
         )
         db.session.add(survey)
@@ -90,28 +63,8 @@ def survey():
 
         # Пренасочване към страницата с резултата
         return redirect(url_for('main.result', survey_id=survey.id))
-<<<<<<< HEAD
     return render_template('main/survey.html', form=form, ad_images=ad_images)
 
-=======
-
-    return render_template('main/survey.html', form=form)
-
-
-#@main_bp.route('/result/<int:survey_id>')
-#@login_required
-#def result(survey_id):
-#    survey = SurveyResponse.query.get_or_404(survey_id)
-#    prob = predict_click_probability(survey)
-#    selected_ad = random.choice(ADS)
-
-    # 🖼️ generate and return image path
-#    user_result_path = generate_user_plot(current_user.id, survey)
-
-#    return render_template('main/result.html', prob=prob, ad=selected_ad, user_result_path=user_result_path)
-
-
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 @main_bp.route('/result/<int:survey_id>')
 @login_required
 def result(survey_id):
@@ -126,7 +79,6 @@ def result(survey_id):
     image_name = generate_user_plot(survey, plot_path)
 
     return render_template('main/result.html', prob=prob, ad='ad1.jpg', user_result_path=image_name)
-
 
 @main_bp.route('/download_regression/<int:user_id>')
 @login_required
@@ -170,7 +122,6 @@ def profile():
     # Зареждане на анкетите и кликовете на текущия потребител
     surveys = SurveyResponse.query.filter_by(user_id=current_user.id).all()
     ad_clicks = AdClick.query.filter_by(user_id=current_user.id).all()
-<<<<<<< HEAD
     return render_template('main/profile.html', form=form, surveys=surveys, ad_clicks=ad_clicks)
 
 @main_bp.route('/toggle_sharing', methods=['POST'])
@@ -229,7 +180,13 @@ def model_metrics():
     metrics = get_model_metrics()
     feature_importance = get_feature_importance()
     
-    return render_template('main/model_metrics.html', metrics=metrics, feature_importance=feature_importance)
+    # Generate model plots
+    plots = generate_model_plots()
+    
+    return render_template('main/model_metrics.html', 
+                         metrics=metrics, 
+                         feature_importance=feature_importance,
+                         plots=plots)
 
 @main_bp.route('/generate_report')
 @login_required
@@ -275,6 +232,36 @@ def generate_report():
     story.append(t)
     story.append(Spacer(1, 20))
     
+    # Model Metrics
+    metrics = get_model_metrics()
+    if metrics:
+        story.append(Paragraph("Model Performance Metrics", styles['Heading2']))
+        model_stats = [
+            ["Metric", "Value"],
+            ["Accuracy", f"{metrics['accuracy']:.3f}"],
+            ["Precision", f"{metrics['precision']:.3f}"],
+            ["Recall", f"{metrics['recall']:.3f}"],
+            ["F1-Score", f"{metrics['f1_score']:.3f}"],
+            ["Log Loss (Entropy)", f"{metrics['logloss']:.3f}"]
+        ]
+        
+        t = Table(model_stats, colWidths=[150, 100])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(t)
+        story.append(Spacer(1, 20))
+    
     # Recent Predictions
     story.append(Paragraph("Recent Predictions", styles['Heading2']))
     recent_surveys = SurveyResponse.query.order_by(SurveyResponse.timestamp.desc()).limit(10).all()
@@ -317,9 +304,6 @@ def generate_report():
         download_name=f'ad_predictor_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
         mimetype='application/pdf'
     )
-=======
-
-    return render_template('main/profile.html', form=form, surveys=surveys, ad_clicks=ad_clicks)
 
 @main_bp.route('/shared_results')
 @login_required
@@ -344,4 +328,3 @@ def shared_results():
         })
     
     return render_template('main/shared_results.html', user_results=user_results)
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818

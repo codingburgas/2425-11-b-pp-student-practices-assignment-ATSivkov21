@@ -2,36 +2,56 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Model Performance Metrics</h2>
+    <h2>Softmax Logistic Regression Model Performance</h2>
     
     {% if metrics %}
     <div class="row">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5>Model Metrics</h5>
+                    <h5>Model Performance Metrics</h5>
                 </div>
                 <div class="card-body">
                     <table class="table">
                         <tr>
                             <td><strong>Accuracy:</strong></td>
-                            <td>{{ "%.3f"|format(metrics.accuracy) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if metrics.accuracy >= 0.8 else 'warning' if metrics.accuracy >= 0.6 else 'danger' }}">
+                                    {{ "%.3f"|format(metrics.accuracy) }}
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Precision:</strong></td>
-                            <td>{{ "%.3f"|format(metrics.precision) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if metrics.precision >= 0.8 else 'warning' if metrics.precision >= 0.6 else 'danger' }}">
+                                    {{ "%.3f"|format(metrics.precision) }}
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Recall:</strong></td>
-                            <td>{{ "%.3f"|format(metrics.recall) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if metrics.recall >= 0.8 else 'warning' if metrics.recall >= 0.6 else 'danger' }}">
+                                    {{ "%.3f"|format(metrics.recall) }}
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>F1-Score:</strong></td>
-                            <td>{{ "%.3f"|format(metrics.f1_score) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if metrics.f1_score >= 0.8 else 'warning' if metrics.f1_score >= 0.6 else 'danger' }}">
+                                    {{ "%.3f"|format(metrics.f1_score) }}
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Log Loss (Entropy):</strong></td>
-                            <td>{{ "%.3f"|format(metrics.logloss) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if metrics.logloss <= 0.3 else 'warning' if metrics.logloss <= 0.5 else 'danger' }}">
+                                    {{ "%.3f"|format(metrics.logloss) }}
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Training Date:</strong></td>
@@ -49,29 +69,122 @@
                 </div>
                 <div class="card-body">
                     {% if metrics.confusion_matrix %}
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Predicted Negative</th>
-                                <th>Predicted Positive</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Actual Negative</strong></td>
-                                <td>{{ metrics.confusion_matrix[0][0] }}</td>
-                                <td>{{ metrics.confusion_matrix[0][1] }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Actual Positive</strong></td>
-                                <td>{{ metrics.confusion_matrix[1][0] }}</td>
-                                <td>{{ metrics.confusion_matrix[1][1] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center">Predicted Negative</th>
+                                    <th class="text-center">Predicted Positive</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-secondary"><strong>Actual Negative</strong></td>
+                                    <td class="text-center bg-success text-white">
+                                        <strong>{{ metrics.confusion_matrix[0][0] }}</strong><br>
+                                        <small>True Negatives</small>
+                                    </td>
+                                    <td class="text-center bg-danger text-white">
+                                        <strong>{{ metrics.confusion_matrix[0][1] }}</strong><br>
+                                        <small>False Positives</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="table-secondary"><strong>Actual Positive</strong></td>
+                                    <td class="text-center bg-warning text-dark">
+                                        <strong>{{ metrics.confusion_matrix[1][0] }}</strong><br>
+                                        <small>False Negatives</small>
+                                    </td>
+                                    <td class="text-center bg-primary text-white">
+                                        <strong>{{ metrics.confusion_matrix[1][1] }}</strong><br>
+                                        <small>True Positives</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
-                    <p>Confusion matrix not available</p>
+                    <p class="text-muted">Confusion matrix not available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Model Visualization Plots -->
+    {% if plots %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Model Training Visualization</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if plots.training_history %}
+                        <div class="col-md-6">
+                            <h6>Training History</h6>
+                            <img src="{{ url_for('static', filename='results/training_history.png') }}" 
+                                 class="img-fluid" alt="Training History">
+                        </div>
+                        {% endif %}
+                        
+                        {% if plots.confusion_matrix %}
+                        <div class="col-md-6">
+                            <h6>Confusion Matrix Visualization</h6>
+                            <img src="{{ url_for('static', filename='results/confusion_matrix.png') }}" 
+                                 class="img-fluid" alt="Confusion Matrix">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Feature Importance (Information Gain)</h5>
+                    <small class="text-muted">Features ranked by their information gain contribution to the model</small>
+                </div>
+                <div class="card-body">
+                    {% if feature_importance %}
+                    <div class="row">
+                        {% for feature, importance in feature_importance.items() %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ feature.replace('_', ' ').title() }}:</span>
+                                <span class="badge bg-info">{{ "%.4f"|format(importance) }}</span>
+                            </div>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-gradient" role="progressbar" 
+                                     style="width: {{ (importance / feature_importance.values()|max) * 100 }}%">
+                                    {{ "%.1f"|format((importance / feature_importance.values()|max) * 100) }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if plots.feature_importance %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Feature Importance Visualization</h6>
+                            <img src="{{ url_for('static', filename='results/feature_importance.png') }}" 
+                                 class="img-fluid" alt="Feature Importance">
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Feature importance not available. Train the model to see feature contributions.
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -82,57 +195,85 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5>Feature Importance (Information Gain)</h5>
+                    <h5>Model Actions</h5>
                 </div>
                 <div class="card-body">
-                    {% if feature_importance %}
-                    <div class="row">
-                        {% for feature, importance in feature_importance.items() %}
-                        <div class="col-md-6 mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span>{{ feature.replace('_', ' ').title() }}:</span>
-                                <span class="badge bg-primary">{{ "%.4f"|format(importance) }}</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: {{ (importance / feature_importance.values()|max) * 100 }}%">
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
+                            <i class="fas fa-cogs"></i> Retrain Model
+                        </a>
+                        <a href="{{ url_for('main.generate_report') }}" class="btn btn-success">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                        <button class="btn btn-info" onclick="refreshMetrics()">
+                            <i class="fas fa-sync-alt"></i> Refresh Metrics
+                        </button>
                     </div>
-                    {% else %}
-                    <p>Feature importance not available</p>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="row mt-4">
-        <div class="col-12">
-            <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
-                Retrain Model
-            </a>
-        </div>
-    </div>
-    
     {% else %}
     <div class="alert alert-info">
-        <h4>No Model Metrics Available</h4>
-        <p>The model hasn't been trained yet or there's not enough data. You need at least 10 survey responses to train the model.</p>
-        <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">Train Model</a>
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle fa-2x me-3"></i>
+            <div>
+                <h4>No Model Metrics Available</h4>
+                <p>The model hasn't been trained yet or there's not enough data. You need at least 10 survey responses to train the model.</p>
+                <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
+                    <i class="fas fa-cogs"></i> Train Model
+                </a>
+            </div>
+        </div>
     </div>
     {% endif %}
 </div>
 
 <style>
 .progress {
-    height: 20px;
+    height: 25px;
     margin-top: 5px;
+    border-radius: 15px;
 }
 .progress-bar {
-    background-color: #007bff;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border-radius: 15px;
+    transition: width 0.6s ease;
+}
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.8em;
+}
+.table-sm td, .table-sm th {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.img-fluid {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
+
+<script>
+function refreshMetrics() {
+    location.reload();
+}
+
+// Auto-refresh metrics every 30 seconds
+setTimeout(function() {
+    if (document.querySelector('.alert-info')) {
+        // Only auto-refresh if there are no metrics (showing the info alert)
+        refreshMetrics();
+    }
+}, 30000);
+</script>
 {% endblock %} 

@@ -4,16 +4,10 @@ from flask import render_template, redirect, url_for, flash, request, send_file,
 from flask_login import login_required, current_user
 # Импорт на Blueprint за admin
 from app.admin import admin_bp
-<<<<<<< HEAD
-from app.models import User, SurveyResponse, Role
-from app.forms import EditUserForm
-=======
 # Импортиране на базовите модели
 from app.models import User, SurveyResponse, AdClick
 # Форми за редакция на потребители и качване на реклами
 from app.forms import EditUserForm, AdUploadForm
-# Импортиране на базата данни
->>>>>>> b9fdf71cb45a9dbe4f7b1a8245ed9de52c9b2818
 from app import db
 # Импорти за файлово записване/четене
 import csv
@@ -23,6 +17,8 @@ import io
 from werkzeug.utils import secure_filename
 # Декоратор за обвиване на функции
 from functools import wraps
+# Импорти за AI модел
+from app.utils.ai_model import get_model_metrics, get_feature_importance, generate_model_plots
 
 # 🎯 Функция-декоратор, която проверява дали потребителят е админ
 def admin_required(f):
@@ -185,22 +181,61 @@ def upload_ad():
 @login_required
 @admin_required
 def model_monitoring():
-    import json
-    import os
+    # Get model metrics
+    metrics = get_model_metrics()
     
-    # Зареждане на метриките на модела
-    metrics_file = os.path.join(current_app.root_path, '..', 'instance', 'model_metrics.json')
-    metrics = {}
+    # Get feature importance
+    feature_importance = get_feature_importance()
     
-    if os.path.exists(metrics_file):
-        with open(metrics_file, 'r') as f:
-            metrics = json.load(f)
+    # Generate model plots
+    plots = generate_model_plots()
     
-    # Зареждане на историята на обучението
+    # Get training history from the model
     from app.utils.ai_model import model
     model.load()
     training_history = model.training_history
     
     return render_template('admin/model_monitoring.html', 
                          metrics=metrics, 
-                         training_history=training_history)
+                         feature_importance=feature_importance,
+                         training_history=training_history,
+                         plots=plots)
+
+# 📈 Download model plots
+@admin_bp.route('/download_model_plot/<plot_type>')
+@login_required
+@admin_required
+def download_model_plot(plot_type):
+    plot_path = os.path.join(current_app.root_path, 'static', 'results', f'{plot_type}.png')
+    if os.path.exists(plot_path):
+        return send_file(plot_path, as_attachment=True, download_name=f'{plot_type}.png')
+    else:
+        flash(f'{plot_type} plot not found.', 'warning')
+        return redirect(url_for('admin.model_monitoring'))
+
+# 📊 Model performance summary
+@admin_bp.route('/model_summary')
+@login_required
+@admin_required
+def model_summary():
+    metrics = get_model_metrics()
+    feature_importance = get_feature_importance()
+    
+    # Calculate summary statistics
+    total_users = User.query.count()
+    total_surveys = SurveyResponse.query.count()
+    total_clicks = AdClick.query.count()
+    
+    summary = {
+        'total_users': total_users,
+        'total_surveys': total_surveys,
+        'total_clicks': total_clicks,
+        'click_rate': total_clicks / total_surveys if total_surveys > 0 else 0,
+        'model_accuracy': metrics['accuracy'] if metrics else None,
+        'model_precision': metrics['precision'] if metrics else None,
+        'model_recall': metrics['recall'] if metrics else None,
+        'model_f1': metrics['f1_score'] if metrics else None,
+        'model_logloss': metrics['logloss'] if metrics else None
+    }
+    
+    return render_template('admin/model_summary.html', summary=summary, feature_importance=feature_importance)

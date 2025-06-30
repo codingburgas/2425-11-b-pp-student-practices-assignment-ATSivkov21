@@ -1,51 +1,177 @@
-{% extends 'layout.html' %}
-{% block title %}Model Monitoring{% endblock %}
+{% extends "layout.html" %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2 class="text-center mb-4">AI Model Monitoring Dashboard</h2>
-    
-    {% if metrics %}
+<div class="container-fluid mt-4">
     <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-line"></i> AI Model Monitoring Dashboard</h2>
+                <div class="btn-group">
+                    <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
+                        <i class="fas fa-cogs"></i> Retrain Model
+                    </a>
+                    <a href="{{ url_for('main.generate_report') }}" class="btn btn-success">
+                        <i class="fas fa-download"></i> Download Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance Overview -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">Accuracy</h4>
+                            <h2 class="mb-0">
+                                {% if metrics and metrics.accuracy %}
+                                    {{ "%.1f"|format(metrics.accuracy * 100) }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">Precision</h4>
+                            <h2 class="mb-0">
+                                {% if metrics and metrics.precision %}
+                                    {{ "%.1f"|format(metrics.precision * 100) }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-crosshairs fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">Recall</h4>
+                            <h2 class="mb-0">
+                                {% if metrics and metrics.recall %}
+                                    {{ "%.1f"|format(metrics.recall * 100) }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-search fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">Log Loss</h4>
+                            <h2 class="mb-0">
+                                {% if metrics and metrics.logloss %}
+                                    {{ "%.3f"|format(metrics.logloss) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-area fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Metrics and Visualizations -->
+    <div class="row mt-4">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5>Model Performance Metrics</h5>
+                    <h5><i class="fas fa-table"></i> Detailed Model Metrics</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table">
-                        <tr>
-                            <td><strong>Accuracy:</strong></td>
-                            <td>
-                                <span class="badge {% if metrics.accuracy > 0.8 %}bg-success{% elif metrics.accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ "%.2f"|format(metrics.accuracy * 100) }}%
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Mean Squared Error:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.mse) }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Log Loss:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.log_loss) }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Final Training Loss:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.training_loss) if metrics.training_loss else 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Final Training Accuracy:</strong></td>
-                            <td>
-                                {% if metrics.training_accuracy %}
-                                <span class="badge {% if metrics.training_accuracy > 0.8 %}bg-success{% elif metrics.training_accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ "%.2f"|format(metrics.training_accuracy * 100) }}%
-                                </span>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
-                        </tr>
+                    {% if metrics %}
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>Accuracy:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if metrics.accuracy >= 0.8 else 'warning' if metrics.accuracy >= 0.6 else 'danger' }}">
+                                        {{ "%.3f"|format(metrics.accuracy) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Precision:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if metrics.precision >= 0.8 else 'warning' if metrics.precision >= 0.6 else 'danger' }}">
+                                        {{ "%.3f"|format(metrics.precision) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Recall:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if metrics.recall >= 0.8 else 'warning' if metrics.recall >= 0.6 else 'danger' }}">
+                                        {{ "%.3f"|format(metrics.recall) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>F1-Score:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if metrics.f1_score >= 0.8 else 'warning' if metrics.f1_score >= 0.6 else 'danger' }}">
+                                        {{ "%.3f"|format(metrics.f1_score) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Log Loss (Entropy):</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if metrics.logloss <= 0.3 else 'warning' if metrics.logloss <= 0.5 else 'danger' }}">
+                                        {{ "%.3f"|format(metrics.logloss) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Training Date:</strong></td>
+                                <td>{{ metrics.training_date.strftime('%Y-%m-%d %H:%M') if metrics.training_date else 'N/A' }}</td>
+                            </tr>
+                        </tbody>
                     </table>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        No model metrics available. Please train the model first.
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -53,72 +179,118 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5>Training History</h5>
+                    <h5><i class="fas fa-th"></i> Confusion Matrix</h5>
                 </div>
                 <div class="card-body">
-                    {% if training_history.loss %}
-                    <h6>Loss Progression:</h6>
-                    <ul class="list-group list-group-flush">
-                        {% for i in range(training_history.loss|length) %}
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Epoch {{ (i + 1) * 10 }}</span>
-                            <span>Loss: {{ "%.4f"|format(training_history.loss[i]) }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                    {% if metrics and metrics.confusion_matrix %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center">Predicted Negative</th>
+                                    <th class="text-center">Predicted Positive</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-secondary"><strong>Actual Negative</strong></td>
+                                    <td class="text-center bg-success text-white">
+                                        <strong>{{ metrics.confusion_matrix[0][0] }}</strong><br>
+                                        <small>True Negatives</small>
+                                    </td>
+                                    <td class="text-center bg-danger text-white">
+                                        <strong>{{ metrics.confusion_matrix[0][1] }}</strong><br>
+                                        <small>False Positives</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="table-secondary"><strong>Actual Positive</strong></td>
+                                    <td class="text-center bg-warning text-dark">
+                                        <strong>{{ metrics.confusion_matrix[1][0] }}</strong><br>
+                                        <small>False Negatives</small>
+                                    </td>
+                                    <td class="text-center bg-primary text-white">
+                                        <strong>{{ metrics.confusion_matrix[1][1] }}</strong><br>
+                                        <small>True Positives</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
-                    <p class="text-muted">No training history available.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Confusion matrix not available.
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Training History -->
+    {% if training_history and training_history.loss %}
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5>Model Status</h5>
+                    <h5><i class="fas fa-chart-line"></i> Training History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Loss Over Time</h6>
+                            <canvas id="lossChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Accuracy Over Time</h6>
+                            <canvas id="accuracyChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Model Plots -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Model Visualizations</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="text-center">
-                                <h6>Model Health</h6>
-                                {% if metrics.accuracy > 0.8 %}
-                                <span class="badge bg-success fs-6">Excellent</span>
-                                {% elif metrics.accuracy > 0.6 %}
-                                <span class="badge bg-warning fs-6">Good</span>
-                                {% else %}
-                                <span class="badge bg-danger fs-6">Needs Improvement</span>
-                                {% endif %}
+                            <h6>Training History</h6>
+                            <img src="{{ url_for('static', filename='results/training_history.png') }}" 
+                                 class="img-fluid" alt="Training History" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="alert alert-info" style="display: none;">
+                                <i class="fas fa-info-circle"></i>
+                                Training history plot not available.
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="text-center">
-                                <h6>Overfitting Check</h6>
-                                {% if metrics.training_accuracy and metrics.accuracy %}
-                                    {% set diff = metrics.training_accuracy - metrics.accuracy %}
-                                    {% if diff > 0.1 %}
-                                    <span class="badge bg-warning fs-6">Potential Overfitting</span>
-                                    {% else %}
-                                    <span class="badge bg-success fs-6">Good Generalization</span>
-                                    {% endif %}
-                                {% else %}
-                                <span class="badge bg-secondary fs-6">Unknown</span>
-                                {% endif %}
+                            <h6>Confusion Matrix</h6>
+                            <img src="{{ url_for('static', filename='results/confusion_matrix.png') }}" 
+                                 class="img-fluid" alt="Confusion Matrix"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="alert alert-info" style="display: none;">
+                                <i class="fas fa-info-circle"></i>
+                                Confusion matrix plot not available.
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="text-center">
-                                <h6>Recommendation</h6>
-                                {% if metrics.accuracy < 0.6 %}
-                                <span class="badge bg-danger fs-6">Retrain Model</span>
-                                {% elif metrics.accuracy < 0.8 %}
-                                <span class="badge bg-warning fs-6">Collect More Data</span>
-                                {% else %}
-                                <span class="badge bg-success fs-6">Model Ready</span>
-                                {% endif %}
+                            <h6>Feature Importance</h6>
+                            <img src="{{ url_for('static', filename='results/feature_importance.png') }}" 
+                                 class="img-fluid" alt="Feature Importance"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="alert alert-info" style="display: none;">
+                                <i class="fas fa-info-circle"></i>
+                                Feature importance plot not available.
                             </div>
                         </div>
                     </div>
@@ -126,16 +298,154 @@
             </div>
         </div>
     </div>
-    {% else %}
-    <div class="text-center">
-        <p class="lead">No model metrics available.</p>
-        <p>Train the model first to see monitoring data.</p>
-        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
-    </div>
-    {% endif %}
-    
-    <div class="text-center mt-4">
-        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+
+    <!-- System Status -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-server"></i> System Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success rounded-circle p-2 me-3">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>Model Status</strong><br>
+                                    <small class="text-muted">
+                                        {% if metrics %}
+                                            Trained
+                                        {% else %}
+                                            Not Trained
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-info rounded-circle p-2 me-3">
+                                    <i class="fas fa-database text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>Database</strong><br>
+                                    <small class="text-muted">Connected</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-cogs"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.train_model') }}" class="btn btn-primary">
+                            <i class="fas fa-cogs"></i> Retrain Model
+                        </a>
+                        <a href="{{ url_for('main.model_metrics') }}" class="btn btn-info">
+                            <i class="fas fa-chart-bar"></i> View Detailed Metrics
+                        </a>
+                        <a href="{{ url_for('main.generate_report') }}" class="btn btn-success">
+                            <i class="fas fa-download"></i> Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    margin-bottom: 1rem;
+}
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.8em;
+}
+.table-sm td, .table-sm th {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+.img-fluid {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.rounded-circle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+
+{% if training_history and training_history.loss %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Loss Chart
+const lossCtx = document.getElementById('lossChart').getContext('2d');
+new Chart(lossCtx, {
+    type: 'line',
+    data: {
+        labels: Array.from({length: {{ training_history.loss|length }}}, (_, i) => i * 100),
+        datasets: [{
+            label: 'Loss',
+            data: {{ training_history.loss|tojson }},
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Accuracy Chart
+const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+new Chart(accuracyCtx, {
+    type: 'line',
+    data: {
+        labels: Array.from({length: {{ training_history.accuracy|length }}}, (_, i) => i * 100),
+        datasets: [{
+            label: 'Accuracy',
+            data: {{ training_history.accuracy|tojson }},
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 1
+            }
+        }
+    }
+});
+</script>
+{% endif %}
 {% endblock %} 
