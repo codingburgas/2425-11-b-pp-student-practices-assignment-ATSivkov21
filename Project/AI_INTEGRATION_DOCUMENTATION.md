@@ -61,17 +61,39 @@ python -m app.utils.train_model
 
 #### Metrics Tracked:
 - **Accuracy**: Classification accuracy on test set
-- **Mean Squared Error (MSE)**: Regression error metric
-- **Log Loss**: Binary cross-entropy loss
-- **Training Loss**: Loss during training epochs
-- **Training Accuracy**: Accuracy during training
+- **Precision**: Proportion of positive identifications that were actually correct
+- **Recall**: Proportion of actual positives that were identified correctly
+- **F1-Score**: Harmonic mean of precision and recall
+- **Log Loss (Entropy)**: Cross-entropy loss for probabilistic predictions
+- **Confusion Matrix**: Table showing correct and incorrect predictions for each class
+- **Information Gain**: Feature importance measured by mutual information
 
 #### Monitoring Dashboard:
 - **Location**: `/admin/model_monitoring`
-- **Features**: Real-time metrics display, training history, model health status
+- **Features**: Real-time metrics display, confusion matrix, information gain, model health status
 - **Recommendations**: Automated suggestions for model improvement
 
-### 5. Web Application Integration
+### 5. Model Algorithm
+
+- **Algorithm**: Softmax (multinomial) logistic regression using scikit-learn
+- **Features Used**:
+    - Age (normalized)
+    - Daily online hours (normalized)
+    - Device (encoded)
+    - Interests length (normalized)
+    - Selected ads count (normalized)
+    - Number of social media platforms used (normalized)
+    - Total time spent on social media (normalized)
+- **Feature Justification**: Information gain is calculated for each feature to justify its inclusion. Features with higher information gain contribute more to the model's predictive power.
+
+### 6. Conclusions
+
+- The model's performance is evaluated using accuracy, precision, recall, F1-score, log loss, and confusion matrix.
+- Information gain analysis shows which features are most informative for predicting ad clicks.
+- Social media usage (number and time) provides additional predictive value, as shown by its information gain.
+- The model is monitored via the admin dashboard, allowing for ongoing evaluation and retraining as new data is collected.
+
+### 7. Web Application Integration
 
 #### Routes Integration:
 - **Survey Route** (`/survey`): Collects data for training
@@ -95,7 +117,7 @@ survey = SurveyResponse(
 prob = predict_click_probability(survey)
 ```
 
-### 6. User Consent System
+### 8. User Consent System
 
 #### Consent Management:
 - **Registration**: Users can opt-in to share results
@@ -114,7 +136,7 @@ shared_surveys = SurveyResponse.query.join(User).filter(
 ).all()
 ```
 
-### 7. Error Handling
+### 9. Error Handling
 
 #### Model Loading:
 - **Fallback**: If no trained model exists, uses dummy data for training
@@ -126,7 +148,7 @@ shared_surveys = SurveyResponse.query.join(User).filter(
 - **Model Errors**: Fallback predictions when model fails
 - **User Feedback**: Clear error messages for users
 
-### 8. Performance Considerations
+### 10. Performance Considerations
 
 #### Optimization:
 - **Model Caching**: Trained model loaded once and reused
@@ -138,7 +160,7 @@ shared_surveys = SurveyResponse.query.join(User).filter(
 - **Feature Scaling**: Normalized features for consistent performance
 - **Database Efficiency**: Optimized queries for large datasets
 
-### 9. Security and Privacy
+### 11. Security and Privacy
 
 #### Data Protection:
 - **User Consent**: Explicit permission for data sharing
@@ -150,7 +172,7 @@ shared_surveys = SurveyResponse.query.join(User).filter(
 - **Output Validation**: Bounded probability outputs
 - **Error Handling**: Secure error messages
 
-### 10. Future Enhancements
+### 12. Future Enhancements
 
 #### Planned Improvements:
 - **Advanced Models**: Support for neural networks

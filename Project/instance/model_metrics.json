@@ -1,7 +1,17 @@
 {
   "accuracy": 1.0,
-  "mse": 0.0017026879253686951,
-  "log_loss": 0.04187008006852304,
-  "training_loss": 0.046089240250823095,
-  "training_accuracy": 1.0
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "log_loss": 0.3725459923736142,
+  "confusion_matrix": [
+    [
+      2,
+      0
+    ],
+    [
+      0,
+      2
+    ]
+  ]
 }

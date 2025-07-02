@@ -47,10 +47,16 @@ def survey():
             device=form.device.data,
             interests=form.interests.data,
             selected_ads=form.selected_ad.data,
+            social_media_names=form.social_media_names.data,
+            social_media_lengths=form.social_media_lengths.data,
             user_id=current_user.id
         )
         db.session.add(survey)
         db.session.commit()
+
+        # Retrain the model after each survey submission
+        import os as _os
+        _os.system('python app/utils/train_model.py')
 
         # Генериране на графика от резултата
         plot_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{current_user.id}.png')
@@ -81,8 +87,11 @@ def result(survey_id):
     # Взимане на анкетата от базата
     survey = SurveyResponse.query.get_or_404(survey_id)
 
-    # Изчисляване на вероятност за кликване (чрез ML модел)
-    prob = predict_click_probability(survey)
+    try:
+        prob = predict_click_probability(survey)
+    except Exception as e:
+        flash('The prediction model is not trained or available. Please contact the administrator or try again later.', 'danger')
+        return redirect(url_for('main.survey'))
 
     # Генериране и запис на логистичната регресия като изображение
     plot_path = os.path.join(current_app.root_path, 'static', 'results', f'user_{current_user.id}.png')

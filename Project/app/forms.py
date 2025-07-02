@@ -26,6 +26,8 @@ class SurveyForm(FlaskForm):
     device = SelectField('Device', choices=[('PC', 'PC'), ('Mobile', 'Mobile'), ('Tablet', 'Tablet')])  # Избор от списък за устройство
     interests = TextAreaField('Your Interests (comma separated)', validators=[DataRequired()])  # Текстово поле за интереси, задължително
     selected_ad = SelectField('Select Your Favorite Ad', validators=[DataRequired()])  # Избор на любима реклама, задължително
+    social_media_names = StringField('Social Media Used (comma separated)', validators=[DataRequired()])
+    social_media_lengths = StringField('Time Spent on Each (comma separated, in hours)', validators=[DataRequired()])
     submit = SubmitField('Submit Survey')  # Бутон за изпращане на анкетата
 
 # Форма за редактиране на потребителски данни (от администратор или потребител)
@@ -33,6 +35,7 @@ class EditUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])  # Поле за потребителско име, задължително
     email = StringField('Email', validators=[Email()])  # Поле за имейл с валидатор
     email_confirmed = BooleanField('Email Confirmed')  # Чекбокс за потвърждение на имейл
+    role = SelectField('Role', coerce=int)  # Dropdown for user role selection
     submit = SubmitField('Save Changes')  # Бутон за записване на промените
 
 # Форма за обновяване на профила (например от потребителя самия)

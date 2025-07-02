@@ -16,34 +16,26 @@
                         <tr>
                             <td><strong>Accuracy:</strong></td>
                             <td>
-                                <span class="badge {% if metrics.accuracy > 0.8 %}bg-success{% elif metrics.accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ "%.2f"|format(metrics.accuracy * 100) }}%
+                                <span class="badge {% if (metrics.accuracy|default(0)) > 0.8 %}bg-success{% elif (metrics.accuracy|default(0)) > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ "%.2f"|format((metrics.accuracy|default(0)) * 100) if metrics.accuracy is defined else 'N/A' }}%
                                 </span>
                             </td>
                         </tr>
                         <tr>
-                            <td><strong>Mean Squared Error:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.mse) }}</td>
+                            <td><strong>Precision:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.precision|default(0)) if metrics.precision is defined else 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Log Loss:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.log_loss) }}</td>
+                            <td><strong>Recall:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.recall|default(0)) if metrics.recall is defined else 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Final Training Loss:</strong></td>
-                            <td>{{ "%.4f"|format(metrics.training_loss) if metrics.training_loss else 'N/A' }}</td>
+                            <td><strong>F1-Score:</strong></td>
+                            <td>{{ "%.4f"|format(metrics.f1_score|default(0)) if metrics.f1_score is defined else 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Final Training Accuracy:</strong></td>
-                            <td>
-                                {% if metrics.training_accuracy %}
-                                <span class="badge {% if metrics.training_accuracy > 0.8 %}bg-success{% elif metrics.training_accuracy > 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ "%.2f"|format(metrics.training_accuracy * 100) }}%
-                                </span>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
+                            <td><strong>Log Loss (Entropy):</strong></td>
+                            <td>{{ "%.4f"|format(metrics.log_loss|default(0)) if metrics.log_loss is defined else 'N/A' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -122,6 +114,70 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Confusion Matrix</h5>
+                </div>
+                <div class="card-body">
+                    {% if metrics.confusion_matrix %}
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                {% for i in range(metrics.confusion_matrix|length) %}
+                                <th>Pred {{ i }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in metrics.confusion_matrix %}
+                            <tr>
+                                <th>True {{ loop.index0 }}</th>
+                                {% for val in row %}
+                                <td>{{ val }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">No confusion matrix available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Information Gain (Feature Importance)</h5>
+                </div>
+                <div class="card-body">
+                    {% if metrics.information_gain %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Information Gain</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feature, gain in metrics.information_gain.items() %}
+                            <tr>
+                                <td>{{ feature }}</td>
+                                <td>{{ "%.4f"|format(gain) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">No information gain data available.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

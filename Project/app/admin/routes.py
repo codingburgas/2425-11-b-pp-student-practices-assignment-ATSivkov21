@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 # Импорт на Blueprint за admin
 from app.admin import admin_bp
 # Импортиране на базовите модели
-from app.models import User, SurveyResponse, AdClick
+from app.models import User, SurveyResponse, AdClick, Role
 # Форми за редакция на потребители и качване на реклами
 from app.forms import EditUserForm, AdUploadForm
 # Импортиране на базата данни
@@ -124,15 +124,18 @@ def download_user_plot(user_id):
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     form = EditUserForm(obj=user)
-
+    # Populate role choices
+    form.role.choices = [(role.id, role.name) for role in Role.query.all()]
+    if request.method == 'GET':
+        form.role.data = user.role_id
     if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
         user.email_confirmed = form.email_confirmed.data
+        user.role_id = form.role.data
         db.session.commit()
         flash('User updated successfully!', 'success')
         return redirect(url_for('admin.dashboard'))
-
     return render_template('admin/edit_user.html', form=form, user=user)
 
 # 🖼️ Качване на рекламно изображение

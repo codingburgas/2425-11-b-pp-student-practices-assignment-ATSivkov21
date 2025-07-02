@@ -42,6 +42,8 @@ class SurveyResponse(db.Model):
     device = db.Column(db.String(64))  # Използвано устройство (PC, Mobile и т.н.)
     interests = db.Column(db.String(256))  # Интереси (текст)
     selected_ads = db.Column(db.String(200), nullable=True)  # Избрани реклами (по избор)
+    social_media_names = db.Column(db.String(256), nullable=True)  # Имена на социални мрежи (CSV)
+    social_media_lengths = db.Column(db.String(256), nullable=True)  # Продължителност на използване на всяка мрежа (CSV)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # Време на попълване, по подразбиране текущо време
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Външен ключ към потребителя, който е попълнил анкетата
 
